@@ -6,6 +6,7 @@ const auth = require("./middleware/auth");
 import createProduct from "./controllers/createProduct";
 import getAllProducts from "./controllers/getAllProducts";
 import getProduct from "./controllers/getProduct";
+import deleteProduct from "./controllers/deleteProduct";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.get("/api/products", (req, res) => {
 app.post("/api/products/", createProduct);
 app.get("/api/products/", getAllProducts);
 app.get("/api/products/:id", getProduct);
+app.delete("/api/products/:id", deleteProduct);
 
 // DB connection and service starting
 const start = async () => {
