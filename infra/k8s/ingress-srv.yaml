@@ -24,3 +24,10 @@ spec:
                 name: product-catalog-srv
                 port:
                   number: 3001
+          - path: /api/reviews/.*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: review-and-rating-srv
+                port:
+                  number: 3002

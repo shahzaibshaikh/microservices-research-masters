@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-and-rating-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: review-and-rating
+  template:
+    metadata:
+      labels:
+        app: review-and-rating
+    spec:
+      containers:
+        - name: review-and-rating
+          image: shahzaibshaikh/review-and-rating
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: SECRET_KEY
+            - name: MONGO_URI_REVIEW
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-uri-secret-review
+                  key: MONGO_URI_REVIEW
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: review-and-rating-srv
+spec:
+  selector:
+    app: review-and-rating
+  ports:
+    - name: review-and-rating
+      protocol: TCP
+      port: 3002
+      targetPort: 3002

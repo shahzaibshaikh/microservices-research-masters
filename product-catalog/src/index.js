@@ -16,10 +16,10 @@ app.set("trust proxy", true);
 app.use(bodyParser.json());
 
 // routes
-app.post("/api/products", createProduct);
+app.post("/api/products", auth, createProduct);
 app.get("/api/products", getAllProducts);
 app.get("/api/products/:id", getProductById);
-app.delete("/api/products/:id", deleteProduct);
+app.delete("/api/products/:id", auth, deleteProduct);
 
 // DB connection and service starting
 const start = async () => {
