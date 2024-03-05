@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 // routes
 app.post("/api/reviews/:productId", auth, createReview);
-app.post("/api/reviews", getAllReviews);
+app.get("/api/reviews", getAllReviews);
 
 // DB connection and service starting
 const start = async () => {

@@ -6,7 +6,7 @@ const createReview = async (req, res) => {
     const { productId } = req.params;
 
     // Extract userId from auth middleware
-    const userId = req.userId;
+    const userId = req.user.userId;
 
     const { rating, text } = req.body;
 
@@ -20,4 +20,4 @@ const createReview = async (req, res) => {
   }
 };
 
-module.exports = Review;
+module.exports = createReview;
