@@ -6,7 +6,8 @@ const productSchema = new mongoose.Schema({
   description: { type: String, required: true },
   image: { type: String, required: false },
   author: { type: String, required: true },
-  published_date: { type: Date, default: Date.now },
+  price: { type: Number, required: true },
+  status: { type: String, enum: ["available", "on-hold", "sold"], default: "available" },
   createdAt: { type: Date, default: Date.now }
 });
 
