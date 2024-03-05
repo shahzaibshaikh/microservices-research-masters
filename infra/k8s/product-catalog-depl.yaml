@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-catalog-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-catalog
+  template:
+    metadata:
+      labels:
+        app: product-catalog
+    spec:
+      containers:
+        - name: product-catalog
+          image: shahzaibshaikh/product-catalog
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: SECRET_KEY
+            - name: MONGO_URI_PRODUCT
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-uri-secret-product
+                  key: MONGO_URI_PRODUCT
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-catalog-srv
+spec:
+  selector:
+    app: product-catalog
+  ports:
+    - name: product-catalog
+      protocol: TCP
+      port: 3001
+      targetPort: 3001
