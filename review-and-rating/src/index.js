@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const auth = require("./middleware/auth");
 const createReview = require("./controllers/createReview");
-const getAllReviews = require("./controllers/getAllReviews");
+const getReviewsByProductId = require("./controllers/getReviewsByProductId");
+const deleteReview = require("./controllers/deleteReview");
 
 const app = express();
 
@@ -15,7 +16,8 @@ app.use(bodyParser.json());
 
 // routes
 app.post("/api/reviews/:productId", auth, createReview);
-app.get("/api/reviews", getAllReviews);
+app.get("/api/reviews/:productId", getReviewsByProductId);
+app.delete("/api/reviews/:reviewId", deleteReview);
 
 // DB connection and service starting
 const start = async () => {
