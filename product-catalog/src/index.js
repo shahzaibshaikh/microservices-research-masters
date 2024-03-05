@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const auth = require("./middleware/auth");
 const createProduct = require("./controllers/createProduct");
 const getAllProducts = require("./controllers/getAllProducts");
-const getProduct = require("./controllers/getProduct");
+const getProductById = require("./controllers/getProductById");
 const deleteProduct = require("./controllers/deleteProduct");
 
 const app = express();
@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 // routes
 app.post("/api/products", createProduct);
 app.get("/api/products", getAllProducts);
-app.get("/api/products/:id", getProduct);
+app.get("/api/products/:id", getProductById);
 app.delete("/api/products/:id", deleteProduct);
 
 // DB connection and service starting
