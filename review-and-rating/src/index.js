@@ -6,6 +6,7 @@ const auth = require("./middleware/auth");
 const createReview = require("./controllers/createReview");
 const getReviewsByProductId = require("./controllers/getReviewsByProductId");
 const deleteReview = require("./controllers/deleteReview");
+const updateReview = require("./controllers/updateReview");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 app.post("/api/reviews/:productId", auth, createReview);
 app.get("/api/reviews/:productId", getReviewsByProductId);
 app.delete("/api/reviews/:reviewId", auth, deleteReview);
+app.put("/api/reviews/:reviewId", auth, updateReview);
 
 // DB connection and service starting
 const start = async () => {
