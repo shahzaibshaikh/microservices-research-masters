@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 // routes
 app.post("/api/reviews/:productId", auth, createReview);
 app.get("/api/reviews/:productId", getReviewsByProductId);
-app.delete("/api/reviews/:reviewId", deleteReview);
+app.delete("/api/reviews/:reviewId", auth, deleteReview);
 
 // DB connection and service starting
 const start = async () => {

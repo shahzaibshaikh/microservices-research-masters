@@ -7,6 +7,7 @@ const createProduct = require("./controllers/createProduct");
 const getAllProducts = require("./controllers/getAllProducts");
 const getProductById = require("./controllers/getProductById");
 const deleteProduct = require("./controllers/deleteProduct");
+const updateProduct = require("./controllers/updateProduct");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.post("/api/products", auth, createProduct);
 app.get("/api/products", getAllProducts);
 app.get("/api/products/:id", getProductById);
 app.delete("/api/products/:id", auth, deleteProduct);
+app.put("/api/products/:id", auth, updateProduct);
 
 // DB connection and service starting
 const start = async () => {
