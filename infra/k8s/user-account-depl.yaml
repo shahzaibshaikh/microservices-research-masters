@@ -21,11 +21,11 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: SECRET_KEY
-            - name: MONGO_URI
+            - name: MONGO_URI_USER
               valueFrom:
                 secretKeyRef:
-                  name: mongo-uri-secret
-                  key: MONGO_URI
+                  name: mongo-uri-secret-user
+                  key: MONGO_URI_USER
 ---
 apiVersion: v1
 kind: Service
