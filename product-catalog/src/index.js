@@ -3,10 +3,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const auth = require("./middleware/auth");
-import createProduct from "./controllers/createProduct";
-import getAllProducts from "./controllers/getAllProducts";
-import getProduct from "./controllers/getProduct";
-import deleteProduct from "./controllers/deleteProduct";
+const createProduct = require("./controllers/createProduct");
+const getAllProducts = require("./controllers/getAllProducts");
+const getProduct = require("./controllers/getProduct");
+const deleteProduct = require("./controllers/deleteProduct");
 
 const app = express();
 
@@ -15,13 +15,9 @@ app.use(bodyParser.json());
 app.set("trust proxy", true);
 app.use(bodyParser.json());
 
-app.get("/api/products", (req, res) => {
-  res.send("<h1>Product Catalog Service is Running!</h1>");
-});
-
 // routes
-app.post("/api/products/", createProduct);
-app.get("/api/products/", getAllProducts);
+app.post("/api/products", createProduct);
+app.get("/api/products", getAllProducts);
 app.get("/api/products/:id", getProduct);
 app.delete("/api/products/:id", deleteProduct);
 

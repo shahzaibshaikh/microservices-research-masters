@@ -17,3 +17,10 @@ spec:
                 name: user-account-srv
                 port:
                   number: 3000
+          - path: /api/products/.*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: product-catalog-srv
+                port:
+                  number: 3001
