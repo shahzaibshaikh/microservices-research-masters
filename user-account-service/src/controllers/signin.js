@@ -1,5 +1,8 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+
+const SECRET_KEY = process.env.SECRET_KEY;
 
 const signIn = async (req, res) => {
   try {
@@ -20,10 +23,16 @@ const signIn = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    user = { id: user._id, email: user.email };
-    // Add any additional logic for user authentication, such as generating tokens
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, {
+      expiresIn: "1h" // Token expiration time
+    });
 
-    res.status(200).json({ user, message: "User signed in successfully" });
+    user = { id: user._id, email: user.email };
+
+    // Add any additional logic for user authentication
+
+    res.status(200).json({ user, token, message: "User signed in successfully" });
   } catch (error) {
     console.error("Error during signin:", error);
     res.status(500).json({ error: "Internal Server Error" });

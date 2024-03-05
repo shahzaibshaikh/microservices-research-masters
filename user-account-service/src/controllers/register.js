@@ -1,7 +1,9 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 const saltRounds = 10; // Number of salt rounds for bcrypt
+const SECRET_KEY = process.env.SECRET_KEY;
 
 const register = async (req, res) => {
   try {
@@ -17,12 +19,21 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Create a new user with hashed password
-    let newUser = new User({ email, password: hashedPassword });
-    newUser = await newUser.save();
+    const newUser = new User({ email, password: hashedPassword });
+    await newUser.save();
 
-    const user = { id: newUser._id, email: newUser.email };
+    // Generate JWT token
+    const token = jwt.sign({ userId: newUser._id, email: newUser.email }, SECRET_KEY, {
+      expiresIn: "1h" // Token expiration time
+    });
 
-    res.status(201).json({ user, message: "User registered successfully" });
+    const userWithoutPassword = { id: newUser._id, email: newUser.email };
+
+    res.status(201).json({
+      user: userWithoutPassword,
+      token,
+      message: "User registered successfully"
+    });
   } catch (error) {
     console.error("Error during registration:", error);
     res.status(500).json({ error: "Internal Server Error" });
