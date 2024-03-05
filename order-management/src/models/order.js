@@ -8,7 +8,7 @@ const orderSchema = new mongoose.Schema({
       quantity: { type: Number, required: true }
     }
   ],
-  totalPrice: { type: Number, required: true },
+  totalQuantity: { type: Number, required: true },
   // paymentDetails: {
   //   paymentId: { type: mongoose.Schema.Types.ObjectId },
   //   paymentStatus: { type: String, enum: ["Pending", "Success", "Failed"], default: "Pending" },
