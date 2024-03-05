@@ -1,5 +1,5 @@
 {
-  "name": "order-management-service",
+  "name": "payment-processing",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

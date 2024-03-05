@@ -1,12 +1,11 @@
 {
-  "name": "review-and-rating-service",
+  "name": "product-catalog",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC"
 }
