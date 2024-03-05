@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-management-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-management
+  template:
+    metadata:
+      labels:
+        app: order-management
+    spec:
+      containers:
+        - name: order-management
+          image: shahzaibshaikh/order-management
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: SECRET_KEY
+            - name: MONGO_URI_ORDER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-uri-secret-order
+                  key: MONGO_URI_ORDER
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-management-srv
+spec:
+  selector:
+    app: order-management
+  ports:
+    - name: order-management
+      protocol: TCP
+      port: 3003
+      targetPort: 3003
