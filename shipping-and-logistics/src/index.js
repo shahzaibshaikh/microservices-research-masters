@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const auth = require("./middleware/auth");
 const createShipping = require("./controllers/createShipping");
 const updateShippingStatus = require("./controllers/updateShippingStatus");
+const getShippingByOrderId = require("./controllers/getShippingByOrderId");
 const app = express();
 
 // middlwares
@@ -15,6 +16,7 @@ app.use(bodyParser.json());
 // routes
 app.post("/api/shipping/:orderId", auth, createShipping);
 app.put("/api/shipping/:orderId", auth, updateShippingStatus);
+app.get("/api/shipping/:orderId", auth, getShippingByOrderId);
 
 // DB connection and service starting
 const start = async () => {

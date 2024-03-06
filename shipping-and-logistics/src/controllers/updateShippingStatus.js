@@ -1,11 +1,9 @@
-// updateShippingStatus.js (controller to update shipping status)
-
 const Shipping = require("../models/shipping");
 
 const updateShippingStatus = async (req, res) => {
   try {
-    const orderId = req.params;
-    const { newStatus } = req.body;
+    const { orderId } = req.params;
+    const { status } = req.body;
 
     // Find the shipping details for the specified order
     const shipping = await Shipping.findOne({ orderId });
@@ -17,7 +15,7 @@ const updateShippingStatus = async (req, res) => {
     }
 
     // Update the shipping status
-    shipping.status = newStatus;
+    shipping.status = status;
 
     // Save the updated shipping details
     const updatedShipping = await shipping.save();

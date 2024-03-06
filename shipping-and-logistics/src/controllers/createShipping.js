@@ -1,5 +1,3 @@
-// createShipping.js (simplified create shipping controller without trackingNumber)
-
 const Shipping = require("../models/shipping");
 
 const getDefaultEstimatedDeliveryDate = () => {
@@ -10,7 +8,7 @@ const getDefaultEstimatedDeliveryDate = () => {
 
 const createShipping = async (req, res) => {
   try {
-    const orderId = req.params;
+    const { orderId } = req.params;
 
     // Check if shipping details for the order already exist
     const existingShipping = await Shipping.findOne({ orderId });
