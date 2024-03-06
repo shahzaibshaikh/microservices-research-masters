@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-and-logistics-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shipping-and-logistics
+  template:
+    metadata:
+      labels:
+        app: shipping-and-logistics
+    spec:
+      containers:
+        - name: shipping-and-logistics
+          image: shahzaibshaikh/shipping-and-logistics
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: SECRET_KEY
+            - name: MONGO_URI_SHIPPING
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-uri-secret-shipping
+                  key: MONGO_URI_SHIPPING
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-and-logistics-srv
+spec:
+  selector:
+    app: shipping-and-logistics
+  ports:
+    - name: shipping-and-logistics
+      protocol: TCP
+      port: 3005
+      targetPort: 3005

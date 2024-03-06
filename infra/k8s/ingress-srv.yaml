@@ -45,3 +45,10 @@ spec:
                 name: payment-processing-srv
                 port:
                   number: 3004
+          - path: /api/shipping/.*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: shipping-and-logistics-srv
+                port:
+                  number: 3005
