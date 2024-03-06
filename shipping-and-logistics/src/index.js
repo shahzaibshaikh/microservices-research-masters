@@ -3,9 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const auth = require("./middleware/auth");
-const processPayment = require("./controllers/processPayment");
-const updatePaymentStatus = require("./controllers/updatePaymentStatus");
-const getPaymentByOrderId = require("./controllers/getPaymentByOrderId");
+const createShipping = require("./controllers/createShipping");
+const updateShippingStatus = require("./controllers/updateShippingStatus");
 const app = express();
 
 // middlwares
@@ -14,9 +13,8 @@ app.set("trust proxy", true);
 app.use(bodyParser.json());
 
 // routes
-app.post("/api/payments/:orderId", auth, processPayment);
-app.put("/api/payments/:orderId", auth, updatePaymentStatus);
-app.get("/api/payments/:orderId", auth, getPaymentByOrderId);
+app.post("/api/shipping/:orderId", auth, createShipping);
+app.put("/api/shipping/:orderId", auth, updateShippingStatus);
 
 // DB connection and service starting
 const start = async () => {
