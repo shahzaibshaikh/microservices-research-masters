@@ -38,3 +38,10 @@ spec:
                 name: order-management-srv
                 port:
                   number: 3003
+          - path: /api/payments/.*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: payment-processing-srv
+                port:
+                  number: 3004

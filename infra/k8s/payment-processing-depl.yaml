@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-processing-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-processing
+  template:
+    metadata:
+      labels:
+        app: payment-processing
+    spec:
+      containers:
+        - name: payment-processing
+          image: shahzaibshaikh/payment-processing
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: SECRET_KEY
+            - name: MONGO_URI_PAYMENT
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-uri-secret-payment
+                  key: MONGO_URI_PAYMENT
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-processing-srv
+spec:
+  selector:
+    app: payment-processing
+  ports:
+    - name: payment-processing
+      protocol: TCP
+      port: 3004
+      targetPort: 3004

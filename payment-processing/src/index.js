@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const auth = require("./middleware/auth");
 const processPayment = require("./controllers/processPayment");
 const updatePaymentStatus = require("./controllers/updatePaymentStatus");
+const getPaymentByOrderId = require("./controllers/getPaymentByOrderId");
 const app = express();
 
 // middlwares
@@ -15,6 +16,7 @@ app.use(bodyParser.json());
 // routes
 app.post("/api/payments/:orderId", auth, processPayment);
 app.put("/api/payments/:orderId", auth, updatePaymentStatus);
+app.get("/api/payments/:orderId", auth, getPaymentByOrderId);
 
 // DB connection and service starting
 const start = async () => {
