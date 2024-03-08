@@ -2,10 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const auth = require("./middleware/auth");
 const createShipping = require("./controllers/createShipping");
 const updateShippingStatus = require("./controllers/updateShippingStatus");
 const getShippingByOrderId = require("./controllers/getShippingByOrderId");
+const { auth } = require("@shahzaibshaikh-research-bookstore/common");
 const app = express();
 
 // middlwares

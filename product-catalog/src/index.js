@@ -2,12 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const auth = require("./middleware/auth");
 const createProduct = require("./controllers/createProduct");
 const getAllProducts = require("./controllers/getAllProducts");
 const getProductById = require("./controllers/getProductById");
 const deleteProduct = require("./controllers/deleteProduct");
 const updateProduct = require("./controllers/updateProduct");
+const { auth } = require("@shahzaibshaikh-research-bookstore/common");
 
 const app = express();
 

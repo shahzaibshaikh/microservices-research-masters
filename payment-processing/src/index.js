@@ -2,10 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const auth = require("./middleware/auth");
 const processPayment = require("./controllers/processPayment");
 const updatePaymentStatus = require("./controllers/updatePaymentStatus");
 const getPaymentByOrderId = require("./controllers/getPaymentByOrderId");
+const { auth } = require("@shahzaibshaikh-research-bookstore/common");
 const app = express();
 
 // middlwares

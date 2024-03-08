@@ -5,7 +5,6 @@ const bodyParser = require("body-parser");
 const register = require("./controllers/register");
 const signin = require("./controllers/signin");
 const profile = require("./controllers/profile");
-// const auth = require("./middleware/auth");
 const { auth } = require("@shahzaibshaikh-research-bookstore/common");
 
 const app = express();

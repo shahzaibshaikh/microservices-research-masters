@@ -2,11 +2,11 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const auth = require("./middleware/auth");
 const createReview = require("./controllers/createReview");
 const getReviewsByProductId = require("./controllers/getReviewsByProductId");
 const deleteReview = require("./controllers/deleteReview");
 const updateReview = require("./controllers/updateReview");
+const { auth } = require("@shahzaibshaikh-research-bookstore/common");
 
 const app = express();
 
