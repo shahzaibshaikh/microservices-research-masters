@@ -6,16 +6,12 @@ class KafkaConfig {
       clientId: "research-bookstore-order",
       brokers: ["kafka-service:9092"],
       retry: {
-        initialRetryDelay: 5000, // Initial delay in milliseconds before retrying
+        initialRetryDelay: 600, // Initial delay in milliseconds before retrying
         maxRetries: 5,         // Maximum number of retries
       },
     });
     this.producer = this.kafka.producer();
     this.consumer = this.kafka.consumer({ groupId: "test-group" });
-  }
-
-  async connect() {
-    await this.consumer.connect(); // Connect once on initialization
   }
 
   async produce(topic, messages) {

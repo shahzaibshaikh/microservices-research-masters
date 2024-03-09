@@ -26,17 +26,11 @@ app.get("/api/orders/:orderId", getOrderById);
 app.put("/api/orders/:orderId", auth, updateOrder);
 app.delete("/api/orders/:orderId", auth, deleteOrder);
 
-async function consumeMessages() {
-  try {
-    await kafkaConfig.consume("order-created-topic", async (value) => {
-      console.log(" Receive message:", value);
-      // Example: Simulate some processing time
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    });
-  } catch (error) {
-    console.error("Error consuming messages:", error);
-  }
-}
+const kafkaConfig = new KafkaConfig();
+kafkaConfig.consume("order-created-topic", (value) => {
+  console.log("📨 Receive message: ", value);
+});
+
 // DB connection and service starting
 const start = async () => {
   try {
