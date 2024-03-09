@@ -1,3 +1,4 @@
+const { KafkaConfig } = require("@shahzaibshaikh-research-bookstore/common");
 const Order = require("../models/order");
 
 const createOrder = async (req, res) => {
@@ -11,6 +12,12 @@ const createOrder = async (req, res) => {
 
     const newOrder = new Order({ userId, products, totalQuantity });
     const savedOrder = await newOrder.save();
+
+    const kafkaConfig = new KafkaConfig();
+    const messages = [{ key: "key1", value: JSON.stringify(savedOrder) }];
+    kafkaConfig.produce("order-created-topic", messages)
+        .then(() => console.log("Messages published successfully in Order service!"))
+        .catch((error) => console.error("Error producing messages:", error));
 
     res.status(201).json({ order: savedOrder, message: "Order created successfully" });
   } catch (error) {

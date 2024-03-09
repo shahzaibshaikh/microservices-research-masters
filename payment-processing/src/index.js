@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const processPayment = require("./controllers/processPayment");
 const updatePaymentStatus = require("./controllers/updatePaymentStatus");
 const getPaymentByOrderId = require("./controllers/getPaymentByOrderId");
-const { auth } = require("@shahzaibshaikh-research-bookstore/common");
+const { auth, KafkaConfig } = require("@shahzaibshaikh-research-bookstore/common");
 const app = express();
 
 // middlwares
@@ -17,6 +17,11 @@ app.use(bodyParser.json());
 app.post("/api/payments/:orderId", auth, processPayment);
 app.put("/api/payments/:orderId", auth, updatePaymentStatus);
 app.get("/api/payments/:orderId", auth, getPaymentByOrderId);
+
+const kafkaConfig = new KafkaConfig();
+kafkaConfig.consume("order-created-topic", (value) => {
+  console.log("📨 Receive message in payments service: ", value);
+});
 
 // DB connection and service starting
 const start = async () => {

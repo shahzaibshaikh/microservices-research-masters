@@ -12,12 +12,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@shahzaibshaikh-research-bookstore/common": "^1.0.3",
+    "@shahzaibshaikh-research-bookstore/common": "^1.0.6",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
     "jsonwebtoken": "^9.0.2",
+    "kafkajs": "^2.2.4",
     "mongoose": "^8.2.0"
   },
   "devDependencies": {

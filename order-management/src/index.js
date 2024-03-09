@@ -8,7 +8,6 @@ const getOrderById = require("./controllers/getOrderById");
 const deleteOrder = require("./controllers/deleteOrder");
 const updateOrder = require("./controllers/updateOrder");
 const { auth, KafkaConfig } = require("@shahzaibshaikh-research-bookstore/common");
-const sendMessageToKafka = require("./controllers/testEvent");
 
 const app = express();
 
@@ -19,16 +18,10 @@ app.use(bodyParser.json());
 
 // routes
 app.post("/api/orders", auth, createOrder);
-app.post("/api/orders/events/", sendMessageToKafka);
 app.get("/api/orders", getAllOrders);
 app.get("/api/orders/:orderId", getOrderById);
 app.put("/api/orders/:orderId", auth, updateOrder);
 app.delete("/api/orders/:orderId", auth, deleteOrder);
-
-const kafkaConfig = new KafkaConfig();
-kafkaConfig.consume("order-created-topic", (value) => {
-  console.log("📨 Receive message: ", value);
-});
 
 // DB connection and service starting
 const start = async () => {
