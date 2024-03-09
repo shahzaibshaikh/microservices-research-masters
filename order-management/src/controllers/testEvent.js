@@ -1,4 +1,4 @@
-const KafkaConfig = require("../events/config");
+const {KafkaConfig} = require("@shahzaibshaikh-research-bookstore/common");
 
 const sendMessageToKafka = async (req, res) => {
   try {

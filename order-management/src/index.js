@@ -7,9 +7,8 @@ const getAllOrders = require("./controllers/getAllOrders");
 const getOrderById = require("./controllers/getOrderById");
 const deleteOrder = require("./controllers/deleteOrder");
 const updateOrder = require("./controllers/updateOrder");
-const { auth } = require("@shahzaibshaikh-research-bookstore/common");
+const { auth, KafkaConfig } = require("@shahzaibshaikh-research-bookstore/common");
 const sendMessageToKafka = require("./controllers/testEvent");
-const KafkaConfig = require("./events/config");
 
 const app = express();
 
