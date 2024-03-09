@@ -4,10 +4,18 @@ class KafkaConfig {
   constructor() {
     this.kafka = new Kafka({
       clientId: "research-bookstore-order",
-      brokers: ["kafka-srv:9092"]
+      brokers: ["kafka-service:9092"],
+      retry: {
+        initialRetryDelay: 5000, // Initial delay in milliseconds before retrying
+        maxRetries: 5,         // Maximum number of retries
+      },
     });
     this.producer = this.kafka.producer();
     this.consumer = this.kafka.consumer({ groupId: "test-group" });
+  }
+
+  async connect() {
+    await this.consumer.connect(); // Connect once on initialization
   }
 
   async produce(topic, messages) {
@@ -28,7 +36,7 @@ class KafkaConfig {
     try {
       await this.consumer.connect();
       await this.consumer.subscribe({ topic: topic, fromBeginning: true });
-      await this.consumer.run({
+    await this.consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
           const value = message.value.toString();
           callback(value);

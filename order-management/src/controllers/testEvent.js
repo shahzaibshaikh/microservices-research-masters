@@ -5,7 +5,10 @@ const sendMessageToKafka = async (req, res) => {
     const { message } = req.body;
     const kafkaConfig = new KafkaConfig();
     const messages = [{ key: "key1", value: message }];
-    kafkaConfig.produce("order-created-topic", messages);
+    kafkaConfig.produce("order-created-topic", messages)
+        .then(() => console.log("Messages published successfully!"))
+        .catch((error) => console.error("Error producing messages:", error));
+    
 
     res.status(200).json({
       status: "Ok!",

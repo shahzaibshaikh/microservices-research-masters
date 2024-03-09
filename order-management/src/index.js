@@ -9,6 +9,7 @@ const deleteOrder = require("./controllers/deleteOrder");
 const updateOrder = require("./controllers/updateOrder");
 const { auth } = require("@shahzaibshaikh-research-bookstore/common");
 const sendMessageToKafka = require("./controllers/testEvent");
+const KafkaConfig = require("./events/config");
 
 const app = express();
 
@@ -25,6 +26,17 @@ app.get("/api/orders/:orderId", getOrderById);
 app.put("/api/orders/:orderId", auth, updateOrder);
 app.delete("/api/orders/:orderId", auth, deleteOrder);
 
+async function consumeMessages() {
+  try {
+    await kafkaConfig.consume("order-created-topic", async (value) => {
+      console.log(" Receive message:", value);
+      // Example: Simulate some processing time
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+  } catch (error) {
+    console.error("Error consuming messages:", error);
+  }
+}
 // DB connection and service starting
 const start = async () => {
   try {
