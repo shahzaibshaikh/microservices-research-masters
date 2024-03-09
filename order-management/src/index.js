@@ -8,6 +8,7 @@ const getOrderById = require("./controllers/getOrderById");
 const deleteOrder = require("./controllers/deleteOrder");
 const updateOrder = require("./controllers/updateOrder");
 const { auth } = require("@shahzaibshaikh-research-bookstore/common");
+const sendMessageToKafka = require("./controllers/testEvent");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 
 // routes
 app.post("/api/orders", auth, createOrder);
+app.post("/api/orders/events/", sendMessageToKafka);
 app.get("/api/orders", getAllOrders);
 app.get("/api/orders/:orderId", getOrderById);
 app.put("/api/orders/:orderId", auth, updateOrder);
