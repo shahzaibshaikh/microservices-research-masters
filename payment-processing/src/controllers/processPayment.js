@@ -1,27 +1,26 @@
 const Payment = require("../models/payment");
 
-const processPayment = async (req, res) => {
+const processPayment = async (value) => {
   try {
-    const { orderId } = req.params;
-    const { amount } = req.body;
+    const messageData = JSON.parse(value);
+
+    // Extract relevant data from the message
+    const orderId = messageData._id;
+    const amount = messageData.totalAmount; 
 
     // Check if a payment for the order already exists
     const existingPayment = await Payment.findOne({ orderId });
 
     if (existingPayment) {
-      return res.status(400).json({ error: "Payment for this order already exists" });
+      return console.error(`Payment for order ${orderId} already exists.`);
     }
 
-    // Create a new payment record
-    const payment = new Payment({ orderId, amount, status: "pending" });
+    const payment = new Payment({ orderId, amount: amount || 0, status: "pending" });
     const savedPayment = await payment.save();
 
-    res
-      .status(201)
-      .json({ payment: savedPayment, message: "Payment entry created successfully" });
+    return savedPayment
   } catch (error) {
-    console.error("Error creating payment:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error processing payment:", error);
   }
 };
 

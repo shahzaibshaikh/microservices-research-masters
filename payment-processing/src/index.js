@@ -14,14 +14,36 @@ app.set("trust proxy", true);
 app.use(bodyParser.json());
 
 // routes
-app.post("/api/payments/:orderId", auth, processPayment);
 app.put("/api/payments/:orderId", auth, updatePaymentStatus);
 app.get("/api/payments/:orderId", auth, getPaymentByOrderId);
 
-const kafkaConfig = new KafkaConfig();
-kafkaConfig.consume("order-created-topic", (value) => {
-  console.log("📨 Receive message in payments service: ", value);
-});
+// Kafka configuration and consumer
+// const kafkaConfig = new KafkaConfig();
+// kafkaConfig.consume("order-created-topic", async (value) => {
+//   try {
+//     const paymentResult = await processPayment(value);
+//     console.log("Payment processed:", paymentResult);
+
+//     // Extract data for event (assuming relevant fields exist)
+//     const orderId = paymentResult.orderId
+//     const paymentId = paymentResult._id;
+//     const paymentStatus = paymentResult.status;
+//     const paymentDate = paymentResult.createdAt;
+
+//     const message = {
+//       orderId,
+//       paymentId,
+//       paymentStatus,
+//       paymentDate,
+//     };
+
+//     await kafkaConfig.produce("payment-created-topic", [{ value: JSON.stringify(message) }]);
+//     console.log("Payment created event published!");
+
+//   } catch (err) {
+//     console.error("Payment processing error:", err);
+//   }
+// });
 
 // DB connection and service starting
 const start = async () => {

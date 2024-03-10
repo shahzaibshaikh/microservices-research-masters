@@ -51,4 +51,9 @@ spec:
           value: INSIDE:PLAINTEXT
         - name: KAFKA_INTER_BROKER_LISTENER_NAME
           value: INSIDE
-        
+        volumeMounts:
+        - name: kafka-cli-tools
+          mountPath: /usr/share/kafka/bin
+      volumes:
+      - name: kafka-cli-tools
+        emptyDir: {}

@@ -5,15 +5,17 @@ const orderSchema = new mongoose.Schema({
   products: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, required: true },
-      quantity: { type: Number, required: true }
+      quantity: { type: Number, required: true },
+      amount: {type: Number, required: true}
     }
   ],
   totalQuantity: { type: Number, required: true },
-  // paymentDetails: {
-  //   paymentId: { type: mongoose.Schema.Types.ObjectId },
-  //   paymentStatus: { type: String, enum: ["Pending", "Success", "Failed"], default: "Pending" },
-  //   paymentDate: { type: Date },
-  // },
+  totalAmount: { type: Number, required: true },
+  paymentDetails: {
+    paymentId: { type: mongoose.Schema.Types.ObjectId },
+    paymentStatus: { type: String, enum: ["pending", "success", "failed"], default: "pending" },
+    paymentDate: { type: Date },
+  },
   // shippingDetails: {
   //   shippingId: { type: String },
   //   shippingStatus: { type: String, enum: ["Pending", "Shipped", "Delivered"], default: "Pending" },
