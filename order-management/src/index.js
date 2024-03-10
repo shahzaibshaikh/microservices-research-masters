@@ -11,31 +11,38 @@ const Order = require("./models/order");
 const { auth, KafkaConfig } = require("@shahzaibshaikh-research-bookstore/common");
 
 const app = express();
+const kafkaConfig = new KafkaConfig("microservices-research-order");
 
 // middlwares
 app.use(bodyParser.json());
 app.set("trust proxy", true);
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+  res.locals.kafka = kafkaConfig; // Attach kafkaConfig to request object
+  next();
+});
+
 // routes
-app.post("/api/orders", auth, createOrder);
+app.post("/api/orders", auth, (req, res) => {
+  createOrder(req, res, kafkaConfig);
+});
 app.get("/api/orders", getAllOrders);
 app.get("/api/orders/:orderId", getOrderById);
 app.put("/api/orders/:orderId", auth, updateOrder);
 app.delete("/api/orders/:orderId", auth, deleteOrder);
 
 
-const kafkaConfig = new KafkaConfig();
 
-kafkaConfig.consume('order-created-topic', async (message) => {
-  try {
-    const order = JSON.parse(message);
-    console.log(`Received order: ${JSON.stringify(order)}`);
+// kafkaConfig.consume('order-created-topic', async (message) => {
+//   try {
+//     const order = JSON.parse(message);
+//     console.log(`Received order: ${JSON.stringify(order)}`);
 
-  } catch (error) {
-    console.error('Error processing received order:', error);
-  }
-});
+//   } catch (error) {
+//     console.error('Error processing received order:', error);
+//   }
+// });
 
 
 // const kafkaConfig = new KafkaConfig();

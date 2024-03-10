@@ -7,6 +7,7 @@ const updatePaymentStatus = require("./controllers/updatePaymentStatus");
 const getPaymentByOrderId = require("./controllers/getPaymentByOrderId");
 const { auth, KafkaConfig } = require("@shahzaibshaikh-research-bookstore/common");
 const app = express();
+const kafkaConfig = new KafkaConfig("microservices-research-payment");
 
 // middlwares
 app.use(bodyParser.json());
@@ -17,33 +18,33 @@ app.use(bodyParser.json());
 app.put("/api/payments/:orderId", auth, updatePaymentStatus);
 app.get("/api/payments/:orderId", auth, getPaymentByOrderId);
 
+
 // Kafka configuration and consumer
-// const kafkaConfig = new KafkaConfig();
-// kafkaConfig.consume("order-created-topic", async (value) => {
-//   try {
-//     const paymentResult = await processPayment(value);
-//     console.log("Payment processed:", paymentResult);
+kafkaConfig.consume("order-created-topic", async (value) => {
+  try {
+    const paymentResult = await processPayment(value);
+    console.log("Payment processed:", paymentResult);
 
-//     // Extract data for event (assuming relevant fields exist)
-//     const orderId = paymentResult.orderId
-//     const paymentId = paymentResult._id;
-//     const paymentStatus = paymentResult.status;
-//     const paymentDate = paymentResult.createdAt;
+    // // Extract data for event (assuming relevant fields exist)
+    // const orderId = paymentResult.orderId
+    // const paymentId = paymentResult._id;
+    // const paymentStatus = paymentResult.status;
+    // const paymentDate = paymentResult.createdAt;
 
-//     const message = {
-//       orderId,
-//       paymentId,
-//       paymentStatus,
-//       paymentDate,
-//     };
+    // const message = {
+    //   orderId,
+    //   paymentId,
+    //   paymentStatus,
+    //   paymentDate,
+    // };
 
-//     await kafkaConfig.produce("payment-created-topic", [{ value: JSON.stringify(message) }]);
-//     console.log("Payment created event published!");
+    // await kafkaConfig.produce("payment-created-topic", [{ value: JSON.stringify(message) }]);
+    // console.log("Payment created event published!");
 
-//   } catch (err) {
-//     console.error("Payment processing error:", err);
-//   }
-// });
+  } catch (err) {
+    console.error("Payment processing error:", err);
+  }
+});
 
 // DB connection and service starting
 const start = async () => {

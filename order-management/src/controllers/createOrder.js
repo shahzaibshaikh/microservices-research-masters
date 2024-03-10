@@ -1,7 +1,7 @@
 const { KafkaConfig } = require("@shahzaibshaikh-research-bookstore/common");
 const Order = require("../models/order");
 
-const createOrder = async (req, res) => {
+const createOrder = async (req, res, kafkaConfig) => {
   try {
     const userId = req.user.userId;
     const { products } = req.body;
@@ -17,7 +17,6 @@ const createOrder = async (req, res) => {
     const newOrder = new Order({ userId, products, totalQuantity, totalAmount });
     const savedOrder = await newOrder.save();
 
-    const kafkaConfig = new KafkaConfig();
     const messages = [{ key: "key1", value: JSON.stringify(savedOrder) }];
     await kafkaConfig.produce("order-created-topic", messages)
       .then(() => {
