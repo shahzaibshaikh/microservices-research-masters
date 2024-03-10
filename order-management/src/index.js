@@ -34,24 +34,22 @@ app.delete("/api/orders/:orderId", auth, deleteOrder);
 
 
 
-// kafkaConfig.consume('order-created-topic', async (message) => {
+// kafkaConfig.consume('payment-created-topic', async (message) => {
 //   try {
 //     const order = JSON.parse(message);
-//     console.log(`Received order: ${JSON.stringify(order)}`);
+//     console.log(`Received payment: ${JSON.stringify(order)}`);
 
 //   } catch (error) {
-//     console.error('Error processing received order:', error);
+//     console.error('Error processing received payment:', error);
 //   }
 // });
 
-
-// const kafkaConfig = new KafkaConfig();
 // kafkaConfig.consume("payment-created-topic", async (value) => {
 //   try {
 //     const paymentData = JSON.parse(value);
 //     const { orderId, paymentId, paymentStatus, paymentDate } = paymentData;
 
-//     console.log("Payment created event received in order:", paymentData);
+//     console.log("Payment event received in order:", paymentData);
 
 //     // Update order with payment details
 //     await updateOrderWithPayment(orderId, paymentId, paymentStatus, paymentDate);
@@ -61,25 +59,25 @@ app.delete("/api/orders/:orderId", auth, deleteOrder);
 //   }
 // });
 
-// const updateOrderWithPayment = async (orderId, paymentId, paymentStatus, paymentDate) => {
-//   const updatedOrder = await Order.findByIdAndUpdate(
-//     orderId,
-//     {
-//       $set: {
-//         paymentDetails: { paymentId, paymentStatus, paymentDate },
-//       },
-//       $setOnInsert: { orderStatus: "processing" },
-//     },
-//     { new: true }
-//   );
+const updateOrderWithPayment = async (orderId, paymentId, paymentStatus, paymentDate) => {
+  const updatedOrder = await Order.findByIdAndUpdate(
+    orderId,
+    {
+      $set: {
+        paymentDetails: { paymentId, paymentStatus, paymentDate },
+      },
+      $setOnInsert: { orderStatus: "processing" },
+    },
+    { new: true }
+  );
 
-//   if (!updatedOrder) {
-//     console.warn("Order not found for payment update:", orderId);
-//     return;
-//   }
+  if (!updatedOrder) {
+    console.warn("Order not found for payment update:", orderId);
+    return;
+  }
 
-//   console.log("Order updated with payment details:", updatedOrder._id);
-// };
+  console.log("Order updated with payment details:", updatedOrder._id);
+};
 
 
 // DB connection and service starting

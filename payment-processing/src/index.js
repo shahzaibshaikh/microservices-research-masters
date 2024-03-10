@@ -25,21 +25,27 @@ kafkaConfig.consume("order-created-topic", async (value) => {
     const paymentResult = await processPayment(value);
     console.log("Payment processed:", paymentResult);
 
-    // // Extract data for event (assuming relevant fields exist)
-    // const orderId = paymentResult.orderId
-    // const paymentId = paymentResult._id;
-    // const paymentStatus = paymentResult.status;
-    // const paymentDate = paymentResult.createdAt;
+    // Extract data for event (assuming relevant fields exist)
+    const orderId = paymentResult.orderId
+    const paymentId = paymentResult._id;
+    const paymentStatus = paymentResult.status;
+    const paymentDate = paymentResult.createdAt;
 
-    // const message = {
-    //   orderId,
-    //   paymentId,
-    //   paymentStatus,
-    //   paymentDate,
-    // };
+    const message = {
+      orderId,
+      paymentId,
+      paymentStatus,
+      paymentDate,
+    };
 
-    // await kafkaConfig.produce("payment-created-topic", [{ value: JSON.stringify(message) }]);
-    // console.log("Payment created event published!");
+    const messages = [{ key: "key1", value: JSON.stringify(message) }];
+    await kafkaConfig.produce("payment-created-topic", messages)
+      .then(() => {
+        console.log(`Payment created event published ${orderId}`);
+      })
+      .catch((error) => {
+        console.error("Error producing messages:", error);
+      });
 
   } catch (err) {
     console.error("Payment processing error:", err);
