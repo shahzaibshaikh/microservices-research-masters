@@ -8,77 +8,40 @@ const getOrderById = require("./controllers/getOrderById");
 const deleteOrder = require("./controllers/deleteOrder");
 const updateOrder = require("./controllers/updateOrder");
 const Order = require("./models/order");
-const { auth, KafkaConfig } = require("@shahzaibshaikh-research-bookstore/common");
+const nats = require("node-nats-streaming");
+const { auth } = require("@shahzaibshaikh-research-bookstore/common");
 
 const app = express();
-const kafkaConfig = new KafkaConfig("microservices-research-order");
 
 // middlwares
 app.use(bodyParser.json());
 app.set("trust proxy", true);
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-  res.locals.kafka = kafkaConfig; // Attach kafkaConfig to request object
-  next();
-});
-
 // routes
-app.post("/api/orders", auth, (req, res) => {
-  createOrder(req, res, kafkaConfig);
-});
+app.post("/api/orders", auth, createOrder);
 app.get("/api/orders", getAllOrders);
 app.get("/api/orders/:orderId", getOrderById);
 app.put("/api/orders/:orderId", auth, updateOrder);
 app.delete("/api/orders/:orderId", auth, deleteOrder);
 
+// NATS Streaming Listener
+const clusterId = "microservices-research"; // Replace with your cluster ID
+const clientId = "order-listener"; // Unique client ID for this listener
 
+const stan = nats.connect(clusterId, clientId, {
+  url: "nats://nats-srv:4222" // Replace with your NATS server URL
+});
 
-// kafkaConfig.consume('payment-created-topic', async (message) => {
-//   try {
-//     const order = JSON.parse(message);
-//     console.log(`Received payment: ${JSON.stringify(order)}`);
+stan.on("connect", () => {
+  console.log(`${clientId} connected to NATS Streaming`);
 
-//   } catch (error) {
-//     console.error('Error processing received payment:', error);
-//   }
-// });
+  const subscription = stan.subscribe("order-created-topic");
 
-// kafkaConfig.consume("payment-created-topic", async (value) => {
-//   try {
-//     const paymentData = JSON.parse(value);
-//     const { orderId, paymentId, paymentStatus, paymentDate } = paymentData;
-
-//     console.log("Payment event received in order:", paymentData);
-
-//     // Update order with payment details
-//     await updateOrderWithPayment(orderId, paymentId, paymentStatus, paymentDate);
-//   } catch (err) {
-//     console.error("Error processing payment created event:", err);
-//     // Handle errors appropriately (e.g., log, retry)
-//   }
-// });
-
-const updateOrderWithPayment = async (orderId, paymentId, paymentStatus, paymentDate) => {
-  const updatedOrder = await Order.findByIdAndUpdate(
-    orderId,
-    {
-      $set: {
-        paymentDetails: { paymentId, paymentStatus, paymentDate },
-      },
-      $setOnInsert: { orderStatus: "processing" },
-    },
-    { new: true }
-  );
-
-  if (!updatedOrder) {
-    console.warn("Order not found for payment update:", orderId);
-    return;
-  }
-
-  console.log("Order updated with payment details:", updatedOrder._id);
-};
-
+  subscription.on("message", msg => {
+    console.log("Message received!");
+  });
+});
 
 // DB connection and service starting
 const start = async () => {

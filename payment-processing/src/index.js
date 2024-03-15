@@ -5,9 +5,8 @@ const bodyParser = require("body-parser");
 const processPayment = require("./controllers/processPayment");
 const updatePaymentStatus = require("./controllers/updatePaymentStatus");
 const getPaymentByOrderId = require("./controllers/getPaymentByOrderId");
-const { auth, KafkaConfig } = require("@shahzaibshaikh-research-bookstore/common");
+const { auth } = require("@shahzaibshaikh-research-bookstore/common");
 const app = express();
-const kafkaConfig = new KafkaConfig("microservices-research-payment");
 
 // middlwares
 app.use(bodyParser.json());
@@ -17,40 +16,6 @@ app.use(bodyParser.json());
 // routes
 app.put("/api/payments/:orderId", auth, updatePaymentStatus);
 app.get("/api/payments/:orderId", auth, getPaymentByOrderId);
-
-
-// Kafka configuration and consumer
-kafkaConfig.consume("order-created-topic", async (value) => {
-  try {
-    const paymentResult = await processPayment(value);
-    console.log("Payment processed:", paymentResult);
-
-    // Extract data for event (assuming relevant fields exist)
-    const orderId = paymentResult.orderId
-    const paymentId = paymentResult._id;
-    const paymentStatus = paymentResult.status;
-    const paymentDate = paymentResult.createdAt;
-
-    const message = {
-      orderId,
-      paymentId,
-      paymentStatus,
-      paymentDate,
-    };
-
-    const messages = [{ key: "key1", value: JSON.stringify(message) }];
-    await kafkaConfig.produce("payment-created-topic", messages)
-      .then(() => {
-        console.log(`Payment created event published ${orderId}`);
-      })
-      .catch((error) => {
-        console.error("Error producing messages:", error);
-      });
-
-  } catch (err) {
-    console.error("Payment processing error:", err);
-  }
-});
 
 // DB connection and service starting
 const start = async () => {
