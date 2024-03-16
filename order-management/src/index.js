@@ -7,10 +7,11 @@ const getAllOrders = require("./controllers/getAllOrders");
 const getOrderById = require("./controllers/getOrderById");
 const deleteOrder = require("./controllers/deleteOrder");
 const updateOrder = require("./controllers/updateOrder");
-const Order = require("./models/order");
-const { auth } = require("@shahzaibshaikh-research-bookstore/common");
-const publisher = require("./controllers/publisher");
-const subscriber = require("./controllers/listener");
+const {
+  auth,
+  publisher,
+  subscriber
+} = require("@shahzaibshaikh-research-bookstore/common");
 
 const app = express();
 // middlwares
