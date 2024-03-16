@@ -18,9 +18,13 @@ app.use(bodyParser.json());
 app.set("trust proxy", true);
 app.use(bodyParser.json());
 
+const processEvent = () => {
+  console.log("Event received!");
+};
+
 // Routes
 app.post("/api/orders/publish", (req, res) => {
-  publisher(req.body);
+  publisher("order-publisher", "order-created-topic", req.body);
   res.status(200).json({ message: "event published from index.js" });
 });
 app.post("/api/orders", auth, createOrder);
