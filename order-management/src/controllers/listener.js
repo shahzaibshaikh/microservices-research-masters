@@ -1,22 +1,37 @@
 const nats = require("node-nats-streaming");
 
-const subscriber = () => {
-  const clusterId = "microservices-research"; // Replace with your cluster ID
-  const clientId = "order-subscriber"; // Unique client ID for this service
+const listener = (
+  clientId,
+  topic,
+  processEvent,
+  queueGroup = null,
+  clusterId = "microservices-research"
+) => {
   const stan = nats.connect(clusterId, clientId, {
     url: "nats://nats-srv:4222" // Replace with your NATS server URL
   });
 
   stan.on("connect", () => {
-    console.log("Subscriber connected to NATS Streaming");
+    console.log(`${clientId} connected to NATS Streaming`);
 
-    // Subscribe to the event
-    const subscription = stan.subscribe("order-created-topic");
+    // Subscribe to the subject with the optional queue group
+    const subscription = stan.subscribe(topic, queueGroup);
 
     subscription.on("message", msg => {
-      console.log("Received message:", msg.getData());
+      // Process the message using the provided function
+      processEvent(msg);
     });
+  });
+
+  // Handle error events
+  stan.on("error", err => {
+    console.error(`${clientId} encountered an error:`, err);
+  });
+
+  // Handle close events
+  stan.on("close", () => {
+    console.log(`${clientId} connection closed`);
   });
 };
 
-module.exports = subscriber;
+module.exports = listener;

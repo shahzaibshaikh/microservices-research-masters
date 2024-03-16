@@ -18,8 +18,9 @@ app.use(bodyParser.json());
 app.set("trust proxy", true);
 app.use(bodyParser.json());
 
-const processEvent = () => {
-  console.log("Event received!");
+const processEvent = msg => {
+  // Perform event processing here
+  console.log("Recieved event:", msg.getData());
 };
 
 // Routes
@@ -39,7 +40,7 @@ const start = async () => {
     await mongoose.connect(process.env.MONGO_URI_ORDER);
     console.log("Connected to Orders database.");
     // Start the subscriber
-    subscriber();
+    subscriber("order-listener", "order-created-topic", processEvent);
   } catch (err) {
     console.error(err);
   }
