@@ -1,9 +1,10 @@
-const Order = require("../models/order");
+import { Request, Response } from "express";
+import Order, { OrderDocument } from "../models/order";
 
-const deleteOrder = async (req, res) => {
+const deleteOrder = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params;
-    const deletedOrder = await Order.findByIdAndDelete(orderId);
+    const deletedOrder: OrderDocument | null = await Order.findByIdAndDelete(orderId);
 
     if (!deletedOrder) {
       return res.status(404).json({ error: "Order not found" });
@@ -16,4 +17,4 @@ const deleteOrder = async (req, res) => {
   }
 };
 
-module.exports = deleteOrder;
+export default deleteOrder;

@@ -1,9 +1,10 @@
-const Order = require("../models/order");
+import { Request, Response } from "express";
+import Order, { OrderDocument } from "../models/order";
 
-const getOrderById = async (req, res) => {
+const getOrderById = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params;
-    const order = await Order.findById(orderId);
+    const order: OrderDocument | null = await Order.findById(orderId);
 
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
@@ -16,4 +17,4 @@ const getOrderById = async (req, res) => {
   }
 };
 
-module.exports = getOrderById;
+export default getOrderById;

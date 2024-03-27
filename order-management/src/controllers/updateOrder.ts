@@ -1,10 +1,12 @@
-const Order = require("../models/order");
-const updateOrder = async (req, res) => {
+import { Request, Response } from "express";
+import Order, { OrderDocument } from "../models/order";
+
+const updateOrder = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params;
-    const { orderStatus } = req.body;
+    const { orderStatus }: { orderStatus: string } = req.body;
 
-    const updatedOrder = await Order.findByIdAndUpdate(
+    const updatedOrder: OrderDocument | null = await Order.findByIdAndUpdate(
       orderId,
       { $set: { orderStatus } },
       { new: true }
@@ -21,4 +23,4 @@ const updateOrder = async (req, res) => {
   }
 };
 
-module.exports = updateOrder;
+export default updateOrder;
