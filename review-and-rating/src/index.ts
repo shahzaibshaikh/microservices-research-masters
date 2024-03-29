@@ -1,16 +1,18 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const createReview = require("./controllers/createReview");
-const getReviewsByProductId = require("./controllers/getReviewsByProductId");
-const deleteReview = require("./controllers/deleteReview");
-const updateReview = require("./controllers/updateReview");
-const { auth } = require("@shahzaibshaikh-research-bookstore/common");
+import dotenv from "dotenv";
+dotenv.config();
+
+import { auth } from "@shahzaibshaikh-research-bookstore/common";
+import bodyParser from "body-parser";
+import express from "express";
+import mongoose from "mongoose";
+import createReview from "./controllers/createReview";
+import deleteReview from "./controllers/deleteReview";
+import getReviewsByProductId from "./controllers/getReviewsByProductId";
+import updateReview from "./controllers/updateReview";
 
 const app = express();
 
-// middlwares
+// middlewares
 app.use(bodyParser.json());
 app.set("trust proxy", true);
 app.use(bodyParser.json());
@@ -22,15 +24,15 @@ app.delete("/api/reviews/:reviewId", auth, deleteReview);
 app.put("/api/reviews/:reviewId", auth, updateReview);
 
 // DB connection and service starting
-const start = async () => {
+const start = async (): Promise<void> => {
   try {
-    await mongoose.connect(process.env.MONGO_URI_REVIEW);
+    await mongoose.connect(process.env.MONGO_URI_REVIEW || "");
     console.log("Connected to Reviews database.");
   } catch (err) {
     console.error(err);
   }
 
-  const PORT = 3002;
+  const PORT: number = 3002;
 
   app.listen(PORT, () => {
     console.log(`ReviewAndRating service running on port ${PORT}`);

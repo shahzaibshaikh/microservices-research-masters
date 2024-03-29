@@ -1,6 +1,7 @@
-const Review = require("../models/review");
+import { Request, Response } from "express";
+import Review from "../models/review";
 
-const deleteReview = async (req, res) => {
+const deleteReview = async (req: Request, res: Response) => {
   try {
     const { reviewId } = req.params;
 
@@ -14,11 +15,11 @@ const deleteReview = async (req, res) => {
     // Delete the review
     await Review.findByIdAndDelete(reviewId);
 
-    res.status(200).json({ message: "Review deleted successfully" });
+    return res.status(200).json({ message: "Review deleted successfully" });
   } catch (error) {
     console.error("Error deleting review:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = deleteReview;
+export default deleteReview;

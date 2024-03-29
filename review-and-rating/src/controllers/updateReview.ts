@@ -1,6 +1,7 @@
-const Review = require("../models/review");
+import { Request, Response } from "express";
+import Review from "../models/review";
 
-const updateReview = async (req, res) => {
+const updateReview = async (req: Request, res: Response) => {
   try {
     const { reviewId } = req.params;
     const { rating, text } = req.body;
@@ -15,13 +16,13 @@ const updateReview = async (req, res) => {
       return res.status(404).json({ error: "Review not found" });
     }
 
-    res
+    return res
       .status(200)
       .json({ review: updatedReview, message: "Review updated successfully" });
   } catch (error) {
     console.error("Error updating review:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = updateReview;
+export default updateReview;
