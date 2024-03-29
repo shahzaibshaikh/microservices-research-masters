@@ -1,6 +1,7 @@
-const Payment = require("../models/payment");
+import Payment from "../models/payment";
+import { Request, Response } from "express";
 
-const updatePaymentStatus = async (req, res) => {
+const updatePaymentStatus = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params; // Extract orderId from URL params
     const { status } = req.body;
@@ -23,4 +24,4 @@ const updatePaymentStatus = async (req, res) => {
   }
 };
 
-module.exports = updatePaymentStatus;
+export default updatePaymentStatus;

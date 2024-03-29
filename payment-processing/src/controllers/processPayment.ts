@@ -1,6 +1,6 @@
-const Payment = require("../models/payment");
+import Payment from "../models/payment";
 
-const processPayment = async value => {
+const processPayment = async (value: string) => {
   try {
     const messageData = JSON.parse(value);
 
@@ -12,7 +12,8 @@ const processPayment = async value => {
     const existingPayment = await Payment.findOne({ orderId });
 
     if (existingPayment) {
-      return console.error(`Payment for order ${orderId} already exists.`);
+      console.error(`Payment for order ${orderId} already exists.`);
+      return;
     }
 
     const payment = new Payment({ orderId, amount: amount || 0, status: "pending" });
@@ -24,4 +25,4 @@ const processPayment = async value => {
   }
 };
 
-module.exports = processPayment;
+export default processPayment;

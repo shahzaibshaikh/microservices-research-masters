@@ -1,6 +1,7 @@
-const Payment = require("../models/payment");
+import Payment from "../models/payment";
+import { Request, Response } from "express";
 
-const getPaymentByOrderId = async (req, res) => {
+const getPaymentByOrderId = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params; // Extract orderId from URL params
 
@@ -18,4 +19,4 @@ const getPaymentByOrderId = async (req, res) => {
   }
 };
 
-module.exports = getPaymentByOrderId;
+export default getPaymentByOrderId;
