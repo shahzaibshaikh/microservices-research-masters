@@ -1,6 +1,7 @@
-const Shipping = require("../models/shipping");
+import { Request, Response } from "express";
+import Shipping from "../models/shipping";
 
-const getShippingByOrderId = async (req, res) => {
+const getShippingByOrderId = async (req: Request, res: Response) => {
   try {
     // Extract orderId from URL params
     const { orderId } = req.params;
@@ -12,16 +13,14 @@ const getShippingByOrderId = async (req, res) => {
       return res.status(404).json({ error: "Shipping details not found for this order" });
     }
 
-    res
-      .status(200)
-      .json({
-        shipping: shippingDetails,
-        message: "Shipping details retrieved successfully"
-      });
+    return res.status(200).json({
+      shipping: shippingDetails,
+      message: "Shipping details retrieved successfully"
+    });
   } catch (error) {
     console.error("Error fetching shipping details:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = getShippingByOrderId;
+export default getShippingByOrderId;

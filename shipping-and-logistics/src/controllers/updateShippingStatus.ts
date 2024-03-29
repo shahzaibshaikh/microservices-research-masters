@@ -1,6 +1,7 @@
-const Shipping = require("../models/shipping");
+import { Request, Response } from "express";
+import Shipping from "../models/shipping";
 
-const updateShippingStatus = async (req, res) => {
+const updateShippingStatus = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
@@ -20,14 +21,14 @@ const updateShippingStatus = async (req, res) => {
     // Save the updated shipping details
     const updatedShipping = await shipping.save();
 
-    res.json({
+    return res.json({
       shipping: updatedShipping,
       message: "Shipping status updated successfully"
     });
   } catch (error) {
     console.error("Error updating shipping status:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = updateShippingStatus;
+export default updateShippingStatus;

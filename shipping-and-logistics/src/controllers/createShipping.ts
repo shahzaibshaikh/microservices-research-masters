@@ -1,12 +1,13 @@
-const Shipping = require("../models/shipping");
+import { Request, Response } from "express";
+import Shipping from "../models/shipping";
 
-const getDefaultEstimatedDeliveryDate = () => {
+const getDefaultEstimatedDeliveryDate = (): Date => {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + 4); // Adding 4 days to the current date
   return currentDate;
 };
 
-const createShipping = async (req, res) => {
+const createShipping = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params;
 
@@ -27,14 +28,14 @@ const createShipping = async (req, res) => {
 
     const savedShipping = await shipping.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       shipping: savedShipping,
       message: "Shipping details created successfully"
     });
   } catch (error) {
     console.error("Error creating shipping details:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = createShipping;
+export default createShipping;
