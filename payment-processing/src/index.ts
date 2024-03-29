@@ -1,13 +1,12 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import { auth } from "@shahzaibshaikh-research-bookstore/common";
+import bodyParser from "body-parser";
 import express from "express";
 import mongoose from "mongoose";
-import bodyParser from "body-parser";
-import processPayment from "./controllers/processPayment";
-import updatePaymentStatus from "./controllers/updatePaymentStatus";
 import getPaymentByOrderId from "./controllers/getPaymentByOrderId";
-import { auth } from "@shahzaibshaikh-research-bookstore/common";
+import updatePaymentStatus from "./controllers/updatePaymentStatus";
 
 const app = express();
 

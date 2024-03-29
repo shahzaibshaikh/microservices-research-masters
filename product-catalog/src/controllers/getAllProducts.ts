@@ -1,6 +1,7 @@
-const Product = require("../models/product");
+import Product from "../models/product";
+import { Request, Response } from "express";
 
-const getAllProducts = async (req, res) => {
+const getAllProducts = async (req: Request, res: Response) => {
   try {
     const products = await Product.find();
     res.status(200).json({ products });
@@ -10,4 +11,4 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-module.exports = getAllProducts;
+export default getAllProducts;

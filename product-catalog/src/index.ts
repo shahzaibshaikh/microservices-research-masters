@@ -1,13 +1,15 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const createProduct = require("./controllers/createProduct");
-const getAllProducts = require("./controllers/getAllProducts");
-const getProductById = require("./controllers/getProductById");
-const deleteProduct = require("./controllers/deleteProduct");
-const updateProduct = require("./controllers/updateProduct");
-const { auth } = require("@shahzaibshaikh-research-bookstore/common");
+import dotenv from "dotenv";
+dotenv.config();
+
+import { auth } from "@shahzaibshaikh-research-bookstore/common";
+import bodyParser from "body-parser";
+import express from "express";
+import mongoose from "mongoose";
+import createProduct from "./controllers/createProduct";
+import deleteProduct from "./controllers/deleteProduct";
+import getAllProducts from "./controllers/getAllProducts";
+import getProductById from "./controllers/getProductById";
+import updateProduct from "./controllers/updateProduct";
 
 const app = express();
 
@@ -26,13 +28,13 @@ app.put("/api/products/:id", auth, updateProduct);
 // DB connection and service starting
 const start = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI_PRODUCT);
+    await mongoose.connect(process.env.MONGO_URI_PRODUCT || "");
     console.log("Connected to Products database.");
   } catch (err) {
     console.error(err);
   }
 
-  const PORT = 3001;
+  const PORT: number = 3001;
 
   app.listen(PORT, () => {
     console.log(`ProductCatalog service running on port ${PORT}`);

@@ -1,6 +1,7 @@
-const Product = require("../models/product");
+import Product from "../models/product";
+import { Request, Response } from "express";
 
-const updateProduct = async (req, res) => {
+const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { title, description, author, price } = req.body;
@@ -24,4 +25,4 @@ const updateProduct = async (req, res) => {
   }
 };
 
-module.exports = updateProduct;
+export default updateProduct;

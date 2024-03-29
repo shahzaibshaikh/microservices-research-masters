@@ -1,7 +1,8 @@
-const Product = require("../models/product");
+import Product from "../models/product";
+import { Request, Response } from "express";
 
-const deleteProduct = async (req, res) => {
-  const productId = req.params.id;
+const deleteProduct = async (req: Request, res: Response) => {
+  const productId: string = req.params.id;
 
   try {
     const deletedProduct = await Product.findByIdAndDelete(productId);
@@ -17,4 +18,4 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-module.exports = deleteProduct;
+export default deleteProduct;
