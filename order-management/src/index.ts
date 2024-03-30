@@ -33,8 +33,6 @@ const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI_ORDER || "");
     console.log("Connected to Orders database.");
-    // Start the subscriber
-    subscriber("order-listener", "order-created-topic", processEvent);
   } catch (err) {
     console.error(err);
   }
@@ -47,8 +45,3 @@ const start = async () => {
 };
 
 start();
-
-const processEvent = (msg: any) => {
-  // Perform event processing here
-  console.log("Received event:", msg.getData());
-};

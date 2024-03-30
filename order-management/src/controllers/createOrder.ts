@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Order, { OrderDocument } from "../models/order";
-import nats, { Stan } from "node-nats-streaming";
+import { publisher } from "@shahzaibshaikh-research-bookstore/common";
 
 interface Product {
   quantity: number;
@@ -35,24 +35,13 @@ const createOrder = async (req: Request, res: Response) => {
       totalAmount
     });
     const savedOrder: OrderDocument = await newOrder.save();
-
-    const clusterId: string = "microservices-research"; // Replace with your cluster ID
-    const clientId: string = "order-service"; // Unique client ID for this service
-    const stan: Stan = nats.connect(clusterId, clientId, {
-      url: "nats://nats-srv:4222" // Replace with your NATS server URL
-    });
-
-    stan.on("connect", () => {
-      console.log("Publisher connected to NATS Streaming");
-    });
-
-    stan.publish("order-created-topic", JSON.stringify(savedOrder), () => {
-      console.log("Event Published!");
-      res.status(201).json({ order: savedOrder, message: "Order created successfully" });
-    });
+    publisher("order-publisher", "order-created-topic", savedOrder);
+    return res
+      .status(201)
+      .json({ order: savedOrder, message: "Order created successfully" });
   } catch (error) {
     console.error("Error creating order:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

@@ -1,12 +1,13 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { auth } from "@shahzaibshaikh-research-bookstore/common";
+import { auth, subscriber } from "@shahzaibshaikh-research-bookstore/common";
 import bodyParser from "body-parser";
 import express from "express";
 import mongoose from "mongoose";
 import getPaymentByOrderId from "./controllers/getPaymentByOrderId";
 import updatePaymentStatus from "./controllers/updatePaymentStatus";
+import processPayment from "./controllers/processPayment";
 
 const app = express();
 
@@ -19,11 +20,19 @@ app.use(bodyParser.json());
 app.put("/api/payments/:orderId", auth, updatePaymentStatus);
 app.get("/api/payments/:orderId", auth, getPaymentByOrderId);
 
-// DB connection and service starting
+// handling order created event
+const processOrderCreatedEvent = async (msg: any) => {
+  const message = msg.getData();
+  console.log("Received event in payments:", message);
+  const paymentDetails = await processPayment(message);
+  console.log(paymentDetails);
+};
+
 const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI_PAYMENT || "");
     console.log("Connected to Payments database.");
+    subscriber("order-listener", "order-created-topic", processOrderCreatedEvent);
   } catch (err) {
     console.error(err);
   }
