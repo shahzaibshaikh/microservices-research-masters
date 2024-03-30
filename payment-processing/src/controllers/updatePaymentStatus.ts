@@ -1,3 +1,4 @@
+import { publisher } from "@shahzaibshaikh-research-bookstore/common";
 import Payment from "../models/payment";
 import { Request, Response } from "express";
 
@@ -16,6 +17,10 @@ const updatePaymentStatus = async (req: Request, res: Response) => {
     // Update the payment status
     payment.status = status;
     const updatedPayment = await payment.save();
+    publisher("payment-publisher", "payment-completed-topic", updatedPayment);
+    console.log({
+      message: `Payment completed event for ${updatedPayment?.orderId}`
+    });
 
     res.json({ payment: updatedPayment, message: "Payment status updated successfully" });
   } catch (error) {

@@ -37,7 +37,7 @@ const orderSchema = new Schema<OrderDocument>({
     paymentId: { type: Schema.Types.ObjectId },
     paymentStatus: {
       type: String,
-      enum: ["pending", "success", "failed"]
+      enum: ["pending", "processed"]
     },
     paymentDate: { type: Date }
   },

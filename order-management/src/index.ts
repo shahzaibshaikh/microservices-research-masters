@@ -3,12 +3,13 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import mongoose from "mongoose";
+import addPaymentDetails from "./controllers/addPaymentDetails";
+import completePayment from "./controllers/completePayment";
 import createOrder from "./controllers/createOrder";
 import deleteOrder from "./controllers/deleteOrder";
 import getAllOrders from "./controllers/getAllOrders";
 import getOrderById from "./controllers/getOrderById";
 import updateOrder from "./controllers/updateOrder";
-import addPaymentDetails from "./controllers/addPaymentDetails";
 
 dotenv.config();
 
@@ -36,12 +37,28 @@ const processPaymentCreatedEvent = async (msg: any) => {
   console.log(updatedOrder);
 };
 
+const processPaymentCompletedEvent = async (msg: any) => {
+  const message = msg.getData();
+  console.log("Received event in orders:", message);
+  const updatedOrder = await completePayment(message);
+  console.log(updatedOrder);
+};
+
 // DB connection and service starting
 const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI_ORDER || "");
     console.log("Connected to Orders database.");
-    subscriber("payment-listener", "payment-created-topic", processPaymentCreatedEvent);
+    subscriber(
+      "payment-creation-listener",
+      "payment-created-topic",
+      processPaymentCreatedEvent
+    );
+    subscriber(
+      "payment-completion-listener",
+      "payment-completed-topic",
+      processPaymentCompletedEvent
+    );
   } catch (err) {
     console.error(err);
   }
