@@ -4,11 +4,11 @@ import Order, { OrderDocument } from "../models/order";
 const updateOrder = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params;
-    const { orderStatus }: { orderStatus: string } = req.body;
+    const { status }: { status: string } = req.body;
 
     const updatedOrder: OrderDocument | null = await Order.findByIdAndUpdate(
       orderId,
-      { $set: { orderStatus } },
+      { $set: { status } },
       { new: true }
     );
 

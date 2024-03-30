@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { auth, subscriber } from "@shahzaibshaikh-research-bookstore/common";
+import { auth, publisher, subscriber } from "@shahzaibshaikh-research-bookstore/common";
 import bodyParser from "body-parser";
 import express from "express";
 import mongoose from "mongoose";
@@ -25,7 +25,10 @@ const processOrderCreatedEvent = async (msg: any) => {
   const message = msg.getData();
   console.log("Received event in payments:", message);
   const paymentDetails = await processPayment(message);
-  console.log(paymentDetails);
+  publisher("payment-publisher", "payment-created-topic", paymentDetails);
+  console.log({
+    message: `Payment created event for ${paymentDetails?.orderId} created`
+  });
 };
 
 const start = async () => {

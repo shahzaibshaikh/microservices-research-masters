@@ -8,6 +8,7 @@ import deleteOrder from "./controllers/deleteOrder";
 import getAllOrders from "./controllers/getAllOrders";
 import getOrderById from "./controllers/getOrderById";
 import updateOrder from "./controllers/updateOrder";
+import addPaymentDetails from "./controllers/addPaymentDetails";
 
 dotenv.config();
 
@@ -28,11 +29,19 @@ app.get("/api/orders/:orderId", getOrderById);
 app.put("/api/orders/:orderId", auth, updateOrder);
 app.delete("/api/orders/:orderId", auth, deleteOrder);
 
+const processPaymentCreatedEvent = async (msg: any) => {
+  const message = msg.getData();
+  console.log("Received event in orders:", message);
+  const updatedOrder = await addPaymentDetails(message);
+  console.log(updatedOrder);
+};
+
 // DB connection and service starting
 const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI_ORDER || "");
     console.log("Connected to Orders database.");
+    subscriber("payment-listener", "payment-created-topic", processPaymentCreatedEvent);
   } catch (err) {
     console.error(err);
   }

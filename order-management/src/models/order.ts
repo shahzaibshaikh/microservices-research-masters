@@ -8,7 +8,7 @@ interface Product {
 
 interface PaymentDetails {
   paymentId?: mongoose.Schema.Types.ObjectId;
-  paymentStatus: "pending" | "success" | "failed";
+  paymentStatus?: "pending" | "success" | "failed";
   paymentDate?: Date;
 }
 
@@ -18,7 +18,7 @@ interface OrderDocument extends Document {
   totalQuantity: number;
   totalAmount: number;
   paymentDetails: PaymentDetails;
-  orderStatus: "pending" | "processing" | "success";
+  status: "pending" | "processing" | "success";
   createdAt: Date;
 }
 
@@ -37,12 +37,11 @@ const orderSchema = new Schema<OrderDocument>({
     paymentId: { type: Schema.Types.ObjectId },
     paymentStatus: {
       type: String,
-      enum: ["pending", "success", "failed"],
-      default: "pending"
+      enum: ["pending", "success", "failed"]
     },
     paymentDate: { type: Date }
   },
-  orderStatus: {
+  status: {
     type: String,
     enum: ["pending", "processing", "success"],
     default: "pending",
