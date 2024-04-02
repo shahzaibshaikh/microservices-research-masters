@@ -8,7 +8,7 @@ interface Product {
 
 interface PaymentDetails {
   paymentId?: mongoose.Schema.Types.ObjectId;
-  paymentStatus?: "pending" | "success" | "failed";
+  paymentStatus?: "pending" | "processed";
   paymentDate?: Date;
 }
 

@@ -1,3 +1,4 @@
+import { publisher } from "@shahzaibshaikh-research-bookstore/common";
 import Payment from "../models/payment";
 
 const processPayment = async (value: string) => {
@@ -18,6 +19,7 @@ const processPayment = async (value: string) => {
 
     const payment = new Payment({ orderId, amount: amount || 0, status: "pending" });
     const savedPayment = await payment.save();
+    publisher("payment-publisher", "payment-created-topic", savedPayment);
     console.log({ message: `Payment for order ${orderId} created.` });
 
     return savedPayment;

@@ -7,34 +7,39 @@ const getDefaultEstimatedDeliveryDate = (): Date => {
   return currentDate;
 };
 
-const createShipping = async (req: Request, res: Response) => {
+const createShipping = async (value: string) => {
   try {
-    const { orderId } = req.params;
+    const messageData = JSON.parse(value);
+
+    // Extract relevant data from the message
+    const orderId = messageData.orderId;
+    const paymentId = messageData._id;
 
     // Check if shipping details for the order already exist
     const existingShipping = await Shipping.findOne({ orderId });
 
     if (existingShipping) {
-      return res
-        .status(400)
-        .json({ error: "Shipping details for this order already exist" });
+      console.log({ error: "Shipping details for this order already exist" });
+      return;
     }
 
     // Create a new shipping record with estimatedDelivery set to 4 days from now
     const shipping = new Shipping({
       orderId,
+      paymentId,
       estimatedDelivery: getDefaultEstimatedDeliveryDate()
     });
 
     const savedShipping = await shipping.save();
 
-    return res.status(201).json({
+    console.log({
       shipping: savedShipping,
       message: "Shipping details created successfully"
     });
+    return;
   } catch (error) {
     console.error("Error creating shipping details:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return;
   }
 };
 
