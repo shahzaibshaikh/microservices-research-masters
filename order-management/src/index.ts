@@ -10,6 +10,7 @@ import deleteOrder from "./controllers/deleteOrder";
 import getAllOrders from "./controllers/getAllOrders";
 import getOrderById from "./controllers/getOrderById";
 import updateOrder from "./controllers/updateOrder";
+import addShippingDetails from "./controllers/addShippingDetails";
 
 dotenv.config();
 
@@ -44,6 +45,13 @@ const processPaymentCompletedEvent = async (msg: any) => {
   console.log(updatedOrder);
 };
 
+const processShippingCreatedEvent = async (msg: any) => {
+  const message = msg.getData();
+  console.log("Received event in orders:", message);
+  const updatedOrder = await addShippingDetails(message);
+  console.log(updatedOrder);
+};
+
 // DB connection and service starting
 const start = async () => {
   try {
@@ -58,6 +66,11 @@ const start = async () => {
       "payment-completion-listener",
       "payment-completed-topic",
       processPaymentCompletedEvent
+    );
+    subscriber(
+      "shipping-created-listener",
+      "shipping-created-topic",
+      processShippingCreatedEvent
     );
   } catch (err) {
     console.error(err);

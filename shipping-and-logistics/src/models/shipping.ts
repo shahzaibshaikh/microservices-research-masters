@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 interface ShippingInterface extends Document {
   orderId: mongoose.Schema.Types.ObjectId;
   paymentId: mongoose.Schema.Types.ObjectId;
-  status: "pending" | "transit" | "shipped";
+  status: "transit" | "shipped";
   estimatedDelivery: Date;
   createdAt: Date;
 }
@@ -12,8 +12,8 @@ const shippingSchema: Schema<ShippingInterface> = new Schema({
   orderId: { type: mongoose.Schema.Types.ObjectId, required: true, unique: true },
   status: {
     type: String,
-    enum: ["pending", "transit", "shipped"],
-    default: "pending",
+    enum: ["transit", "shipped"],
+    default: "transit",
     required: true
   },
   estimatedDelivery: { type: Date, required: true },

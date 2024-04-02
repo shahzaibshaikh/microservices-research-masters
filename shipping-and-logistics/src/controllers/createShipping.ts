@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Shipping from "../models/shipping";
+import { publisher } from "@shahzaibshaikh-research-bookstore/common";
 
 const getDefaultEstimatedDeliveryDate = (): Date => {
   const currentDate = new Date();
@@ -32,6 +33,7 @@ const createShipping = async (value: string) => {
 
     const savedShipping = await shipping.save();
 
+    publisher("shipping-publisher", "shipping-created-topic", savedShipping);
     console.log({
       shipping: savedShipping,
       message: "Shipping details created successfully"

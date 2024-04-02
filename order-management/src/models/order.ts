@@ -18,6 +18,7 @@ interface OrderDocument extends Document {
   totalQuantity: number;
   totalAmount: number;
   paymentDetails: PaymentDetails;
+  shippingId: mongoose.Schema.Types.ObjectId;
   status: "pending" | "processing" | "success";
   createdAt: Date;
 }
@@ -47,6 +48,7 @@ const orderSchema = new Schema<OrderDocument>({
     default: "pending",
     required: true
   },
+  shippingId: { type: Schema.Types.ObjectId },
   createdAt: { type: Date, default: Date.now }
 });
 

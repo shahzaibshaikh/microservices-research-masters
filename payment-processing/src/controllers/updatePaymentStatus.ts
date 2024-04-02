@@ -17,7 +17,7 @@ const updatePaymentStatus = async (req: Request, res: Response) => {
     // Update the payment status
     payment.status = status;
     const updatedPayment = await payment.save();
-    publisher("payment-publisher", "payment-completed-topic", updatedPayment);
+    publisher("payment-publisher-order", "payment-completed-topic", updatedPayment);
     console.log({
       message: `Payment completed event for ${updatedPayment?.orderId}`
     });

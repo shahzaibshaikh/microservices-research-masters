@@ -17,8 +17,7 @@ app.set("trust proxy", true);
 app.use(bodyParser.json());
 
 // routes
-// app.post("/api/shipping/:orderId", auth, createShipping);
-app.put("/api/shipping/:orderId", auth, updateShippingStatus);
+// app.put("/api/shipping/:orderId", auth, updateShippingStatus);
 app.get("/api/shipping/:orderId", auth, getShippingByOrderId);
 
 const processPaymentCreatedEvent = async (msg: any) => {
@@ -26,6 +25,13 @@ const processPaymentCreatedEvent = async (msg: any) => {
   console.log("Received event in shipping:", message);
   const shippingDetails = await createShipping(message);
   console.log(shippingDetails);
+};
+
+const processPaymentCompletedEvent = async (msg: any) => {
+  const message = msg.getData();
+  console.log("Received event in orders:", message);
+  const updatedOrder = await updateShippingStatus(message);
+  console.log(updatedOrder);
 };
 
 // DB connection and service starting
@@ -37,6 +43,11 @@ const start = async (): Promise<void> => {
       "payment-creation-listener-shipping",
       "payment-created-topic",
       processPaymentCreatedEvent
+    );
+    subscriber(
+      "payment-completion-listener-shipping",
+      "payment-completed-topic",
+      processPaymentCompletedEvent
     );
   } catch (err) {
     console.error(err);
