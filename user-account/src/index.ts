@@ -34,7 +34,7 @@ const start = async () => {
     console.error(err);
   }
 
-  const PORT: number = 3000;
+  const PORT: number = 3006;
 
   app.listen(PORT, () => {
     console.log(`UserAccount service running on port ${PORT}`);

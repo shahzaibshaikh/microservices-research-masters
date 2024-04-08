@@ -19,7 +19,7 @@ spec:
         image: grafana/grafana:latest
         ports:
         - name: grafana
-          containerPort: 4000
+          containerPort: 4012
         resources:
           limits:
             memory: "1Gi"
@@ -40,3 +40,20 @@ spec:
           configMap:
               defaultMode: 420
               name: grafana-datasources
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+  annotations:
+      prometheus.io/scrape: 'true'
+      prometheus.io/port:   '4012'
+spec:
+  selector: 
+    app: grafana
+  type: NodePort  
+  ports:
+    - port: 4012
+      targetPort: 4012
+      nodePort: 32000
