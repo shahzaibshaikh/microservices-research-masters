@@ -19,7 +19,7 @@ spec:
         image: grafana/grafana:latest
         ports:
         - name: grafana
-          containerPort: 3000
+          containerPort: 4000
         resources:
           limits:
             memory: "1Gi"
