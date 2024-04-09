@@ -16,7 +16,7 @@ spec:
               service:
                 name: user-account-srv
                 port:
-                  number: 3000
+                  number: 3006
           - path: /api/products/.*
             pathType: ImplementationSpecific
             backend:
