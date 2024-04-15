@@ -2,7 +2,7 @@ from locust import HttpUser, task, between
 
 class TestCycle(HttpUser):
     wait_time = between(1, 1)  # Time between consecutive requests in seconds
-    headers = {"Content-Type": "application/json", "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NWU2YmZmNjMwODM4YmYzMTI2MWY3ZWUiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE3MTMyMTI1OTcsImV4cCI6MTcxMzIzNDE5N30.7pCdZGaq_KWcq_r36jLWoNo17LUOSWGYPBCUhzOQe_w"}
+    headers = {"Content-Type": "application/json", "Authorization": "Bearer Token"}
     @task(3)
     def get_orders(self):
         self.client.get("/api/orders/")
