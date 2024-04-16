@@ -16,6 +16,8 @@ const reviewSchema: Schema<ReviewInterface> = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+reviewSchema.index({ _id: 1 });
+
 const Review: Model<ReviewInterface> = mongoose.model<ReviewInterface>(
   "Review",
   reviewSchema
