@@ -52,6 +52,8 @@ const orderSchema = new Schema<OrderDocument>({
   createdAt: { type: Date, default: Date.now }
 });
 
+orderSchema.index({ _id: 1 });
+
 const Order = mongoose.model<OrderDocument>("Order", orderSchema);
 
 export { OrderDocument };
