@@ -14,6 +14,8 @@ const userSchema: Schema<UserInterface> = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+userSchema.index({ email: 1 });
+
 const User: Model<UserInterface> = mongoose.model<UserInterface>("User", userSchema);
 
 export default User;

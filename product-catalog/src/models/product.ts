@@ -22,6 +22,8 @@ const productSchema: Schema<ProductInterface> = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+productSchema.index({ _id: 1 });
+
 const Product: Model<ProductInterface> = mongoose.model<ProductInterface>(
   "Product",
   productSchema

@@ -21,6 +21,8 @@ const shippingSchema: Schema<ShippingInterface> = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+shippingSchema.index({ _id: 1 });
+
 const Shipping: Model<ShippingInterface> = mongoose.model<ShippingInterface>(
   "Shipping",
   shippingSchema
