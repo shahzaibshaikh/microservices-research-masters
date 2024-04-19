@@ -19,6 +19,8 @@ const paymentSchema: Schema<PaymentInterface> = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+paymentSchema.index({ _id: 1 });
+
 const Payment: Model<PaymentInterface> = mongoose.model<PaymentInterface>(
   "Payment",
   paymentSchema
