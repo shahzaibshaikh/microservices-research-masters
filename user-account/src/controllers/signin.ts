@@ -27,7 +27,7 @@ const signIn = async (req: Request, res: Response) => {
     // Generate JWT token
     if (!SECRET_KEY) throw new Error("Secret key is not provided");
     const token: string = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, {
-      expiresIn: "6h" // Token expiration time
+      expiresIn: "24h" // Token expiration time
     });
 
     const userWithoutPassword = { id: user._id, email: user.email };
@@ -36,7 +36,11 @@ const signIn = async (req: Request, res: Response) => {
 
     res
       .status(200)
-      .json({ user: userWithoutPassword, token, message: "User signed in successfully" });
+      .json({
+        user: userWithoutPassword,
+        token,
+        message: "User signed in successfully, 24 hours."
+      });
   } catch (error) {
     console.error("Error during signin:", error);
     res.status(500).json({ error: "Internal Server Error" });
