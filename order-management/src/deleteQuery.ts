@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 // MongoDB connection URI
-const uri = "mongodb+srv";
+const uri = "MONGO_URI";
 
 // Function to connect to the MongoDB database and perform the delete operation
 async function deleteDocuments() {
@@ -14,7 +14,6 @@ async function deleteDocuments() {
     const filter = {
       _id: { $ne: new mongoose.Types.ObjectId("661edf7bcb5fb9aa8129a725") }
     };
-
     // Delete documents from the collection
     const result = await mongoose.connection.db.collection("products").deleteMany(filter);
     console.log(`${result.deletedCount} documents deleted`);
