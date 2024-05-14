@@ -7,7 +7,7 @@ class UserTasks(HttpUser):
     wait_time = between(4, 8)
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer Token"
+        "Authorization": "Bearer TOKEN"
         # Add your actual token here
     }
     count = 0
