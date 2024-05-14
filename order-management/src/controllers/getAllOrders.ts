@@ -3,7 +3,7 @@ import Order, { OrderDocument } from "../models/order";
 
 const getAllOrders = async (req: Request, res: Response) => {
   try {
-    const orders: OrderDocument[] = await Order.find();
+    const orders: OrderDocument[] = await Order.find().limit(10);
     res.status(200).json({ orders });
   } catch (error) {
     console.error("Error fetching all orders:", error);
