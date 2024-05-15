@@ -5,7 +5,7 @@ const getAllReviewsByProductId = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
 
-    const reviews = await Review.find({ productId });
+    const reviews = await Review.find({ productId }).limit(10);
 
     return res.status(200).json({ reviews });
   } catch (error) {
