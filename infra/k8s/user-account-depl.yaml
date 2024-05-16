@@ -15,6 +15,11 @@ spec:
       containers:
         - name: user-account
           image: shahzaibshaikh/user-account
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
           env:
             - name: SECRET_KEY
               valueFrom:

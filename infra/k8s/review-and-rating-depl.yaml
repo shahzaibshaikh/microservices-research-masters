@@ -15,6 +15,11 @@ spec:
       containers:
         - name: review-and-rating
           image: shahzaibshaikh/review-and-rating
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
           env:
             - name: SECRET_KEY
               valueFrom:

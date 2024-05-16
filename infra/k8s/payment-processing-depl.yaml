@@ -15,6 +15,11 @@ spec:
       containers:
         - name: payment-processing
           image: shahzaibshaikh/payment-processing
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
           env:
             - name: SECRET_KEY
               valueFrom:

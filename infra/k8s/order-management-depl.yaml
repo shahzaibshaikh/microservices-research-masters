@@ -15,6 +15,11 @@ spec:
       containers:
         - name: order-management
           image: shahzaibshaikh/order-management
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
           env:
             - name: SECRET_KEY
               valueFrom:
