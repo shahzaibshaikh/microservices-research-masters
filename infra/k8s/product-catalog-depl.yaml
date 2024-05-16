@@ -15,6 +15,11 @@ spec:
       containers:
         - name: product-catalog
           image: shahzaibshaikh/product-catalog
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
           env:
             - name: SECRET_KEY
               valueFrom:

@@ -7,7 +7,7 @@ class UserTasks(HttpUser):
     wait_time = between(4, 8)
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer Token"
+        "Authorization": "Bearer TOKEN"
         # Add your actual token here
     }
     count = 0
@@ -19,7 +19,7 @@ class UserTasks(HttpUser):
 
     @task(3)
     def get_order_by_id(self):
-        order_id = "664414773da5c1c8d4813503"
+        order_id = "6644b843acfa58bd2c39b514"
         self.client.get(f"/api/orders/{order_id}", headers=self.headers)
 
     @task(1)
@@ -42,24 +42,24 @@ class UserTasks(HttpUser):
 
     @task(3)
     def put_order_by_id(self):
-        order_id = "664414773da5c1c8d4813503"
+        order_id = "6644b843acfa58bd2c39b514"
         body = {
             "status": "success"
         }
         self.client.put(f"/api/orders/{order_id}", json=body, headers=self.headers)
 
-    # @task(3)
-    # def put_payment_by_id(self):
-    #     payment_id = "663853e3e4e9a41bc9b72e62"
-    #     body = {
-    #         "status": "processed"
-    #     }
-    #     self.client.put(f"/api/payments/{payment_id}", json=body, headers=self.headers)
+    @task(3)
+    def put_payment_by_id(self):
+        payment_id = "6644c5deeb304b7882a93500"
+        body = {
+            "status": "processed"
+        }
+        self.client.put(f"/api/payments/{payment_id}", json=body, headers=self.headers)
 
-    # @task(4)
-    # def get_payment_by_id(self):
-    #     payment_id = "663853e3e4e9a41bc9b72e62"
-    #     self.client.get(f"/api/payments/{payment_id}", headers=self.headers)
+    @task(4)
+    def get_payment_by_id(self):
+        payment_id = "6644c5deeb304b7882a93500"
+        self.client.get(f"/api/payments/{payment_id}", headers=self.headers)
 
     @task(1)
     def post_products(self):
@@ -77,12 +77,12 @@ class UserTasks(HttpUser):
 
     @task(4)
     def get_product_by_id(self):
-        product_id = "6644124d8ff89752d41fca9c"
+        product_id = "6644b832a281bbdd1e6904c7"
         self.client.get(f"/api/products/{product_id}", headers=self.headers)
 
     @task(3)
     def put_product_by_id(self):
-        product_id = "6644124d8ff89752d41fca9c"
+        product_id = "6644b832a281bbdd1e6904c7"
         body = {
             "name": "Updated Product",
             "price": 32
@@ -91,7 +91,7 @@ class UserTasks(HttpUser):
 
     @task(1)
     def post_review(self):
-        product_id = "6644124d8ff89752d41fca9c"
+        product_id = "6644b832a281bbdd1e6904c7"
         body = {
             "rating": 5,
             "text": "Great product!"
@@ -100,7 +100,7 @@ class UserTasks(HttpUser):
 
     @task(2)
     def put_review_by_id(self):
-        review_id = "661ee4bde6254c704e7d3b29"
+        review_id = "6644b84c9e5acbe541822e20"
         body = {
             "rating": 4,
             "text": "Updated review"
@@ -109,13 +109,13 @@ class UserTasks(HttpUser):
 
     @task(2)
     def get_review_by_id(self):
-        review_id = "6644124d8ff89752d41fca9c"
-        self.client.get(f"/api/reviews/{review_id}", headers=self.headers)
+        product_id = "6644b832a281bbdd1e6904c7"
+        self.client.get(f"/api/reviews/{product_id}", headers=self.headers)
 
-    # @task(2)
-    # def get_shipping_by_id(self):
-    #     order_id = "661ee334633ab98f51985c24"
-    #     self.client.get(f"/api/shipping/{order_id}", headers=self.headers)
+    @task(2)
+    def get_shipping_by_id(self):
+        order_id = "6644cc98eb304b7882ae8fa1"
+        self.client.get(f"/api/shipping/{order_id}", headers=self.headers)
 
     # @task(1)
     # def post_register_user(self):

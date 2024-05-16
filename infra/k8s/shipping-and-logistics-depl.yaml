@@ -15,6 +15,11 @@ spec:
       containers:
         - name: shipping-and-logistics
           image: shahzaibshaikh/shipping-and-logistics
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
           env:
             - name: SECRET_KEY
               valueFrom:
