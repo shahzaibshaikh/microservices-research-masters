@@ -1,0 +1,3422 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      email: support@mongodb.com
+    labels:
+      owner: mongodb
+    name: mongodb-kubernetes-operator
+    namespace: database
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        name: mongodb-kubernetes-operator
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 1
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: mongodb-kubernetes-operator
+      spec:
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: name
+                  operator: In
+                  values:
+                  - mongodb-kubernetes-operator
+              topologyKey: kubernetes.io/hostname
+        containers:
+        - command:
+          - /usr/local/bin/entrypoint
+          env:
+          - name: WATCH_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: OPERATOR_NAME
+            value: mongodb-kubernetes-operator
+          - name: AGENT_IMAGE
+            value: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          - name: VERSION_UPGRADE_HOOK_IMAGE
+            value: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          - name: READINESS_PROBE_IMAGE
+            value: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          - name: MONGODB_IMAGE
+            value: mongodb-community-server
+          - name: MONGODB_REPO_URL
+            value: quay.io/mongodb
+          image: quay.io/mongodb/mongodb-kubernetes-operator:0.9.0
+          imagePullPolicy: Always
+          name: mongodb-kubernetes-operator
+          resources:
+            limits:
+              cpu: 1100m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 200Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsUser: 2000
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault
+        serviceAccount: mongodb-kubernetes-operator
+        serviceAccountName: mongodb-kubernetes-operator
+        terminationGracePeriodSeconds: 30
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: order-management-db-svc
+    name: order-management-db-svc
+    namespace: database
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mongodb
+      port: 27017
+    publishNotReadyAddresses: true
+    selector:
+      app: order-management-db-svc
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: payment-processing-db-svc
+    name: payment-processing-db-svc
+    namespace: database
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mongodb
+      port: 27017
+    publishNotReadyAddresses: true
+    selector:
+      app: payment-processing-db-svc
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: product-catalog-db-svc
+    name: product-catalog-db-svc
+    namespace: database
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mongodb
+      port: 27017
+    publishNotReadyAddresses: true
+    selector:
+      app: product-catalog-db-svc
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: review-and-rating-db-svc
+    name: review-and-rating-db-svc
+    namespace: database
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mongodb
+      port: 27017
+    publishNotReadyAddresses: true
+    selector:
+      app: review-and-rating-db-svc
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: shipping-and-logistics-db-svc
+    name: shipping-and-logistics-db-svc
+    namespace: database
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mongodb
+      port: 27017
+    publishNotReadyAddresses: true
+    selector:
+      app: shipping-and-logistics-db-svc
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: user-account-db-svc
+    name: user-account-db-svc
+    namespace: database
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mongodb
+      port: 27017
+    publishNotReadyAddresses: true
+    selector:
+      app: user-account-db-svc
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIIH8EDJ9VGpfAwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNDAzMDQwNjI0NDRaFw0zNDAzMDIwNjI5NDRaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCo+Uh2PfFkLFYjtrE4wXnY+kkSD8E+sGSjO5eTK8H99gPbJ+v9oJvPRKb/
+      pVfPHxSODX+HTSUWLMZYo5z2499bjlZQ7hNN2JF8A0gJFlOAksNDA8PkalUpcwao
+      +YInlT5IlBT8+Opg08VS0N3YsoA2Unk+u9VL6gEKlarHZduVRlcY2blxreqYIG9i
+      uw3TF5nb9xKKvgAt8/HmllsZFE/uneZ9l2NLwXKbRXGlb/fdTOwDajbnJH3IaELM
+      RGLuzknVKUYEXXdM4ykYNByVamibsS//+Dz3VfMSyzEppSPbKLaMlX06YA5bEeLg
+      y05Unsa8V3DT8oR7TqHRuC2eYR3HAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBS7juCsW3HvdkYNKQqEljLtdnV4uTAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQBowtNpEflP
+      fhB+KBLvt+9qusV0vHvwlpt0j7at0hcqLYOi8unt5yks9obAWgffvPEjzDPHBKmb
+      crnXoTeP6Kb694m0VIooaAKrBWguVSmi1IS7DLFr1GgtwoXokHBZLMGoTDHxlrWo
+      LKU55oenaXt3CRCbo3DMCxzw9gO6GxWzUlk4gE16sFDqFb1oXc09R6/7IEBorqEf
+      AN6aNYmfg4R6pXFlMotduq2GmSpwfxTgZTJb6ZURttCvxNONZ4MzRBHZt/5bz51C
+      JyPPFA+LFdrLHXJamK15SVJJ9b9IE3nnDUbG/lFmXJHPJGbiokYWZFH58hm5gSn9
+      ElbQeAdCy3Mf
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: database
+- apiVersion: v1
+  data:
+    sha-1-server-key: QlltaURFTzNWRG9wQ3FqY0VBMzZnS1p5aVVFPQ==
+    sha-1-stored-key: ckxZTVpTdFJ0dWdwTmZvMUFQMmZ2bWNNVngwPQ==
+    sha-256-server-key: eVp1QU5RdXdQSTQ2N0lQRktpcy8wblJXbmNKSEhBNTFieXhHUlp0eVU0WT0=
+    sha-256-stored-key: RXBiUzJVWW1vMWQ2WUt2MTdLUTl0TExsbWZETEhXWVNIakVLL0FmN2J1Yz0=
+    sha1-salt: WENYQ1dkTUdLWU1CbU5hRnlSZHJFZz09
+    sha256-salt: YWpuK3BlOUo5UkJPVlZ4SmlkVWFHVmxqOXFDQ3FKNDZ4NHJ5cmc9PQ==
+  kind: Secret
+  metadata:
+    name: my-scram-scram-credentials
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    password: MTIzNDU2Nzg=
+  kind: Secret
+  metadata:
+    name: my-user-password
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    connectionString.standard: bW9uZ29kYjovL215LXVzZXI6MTIzNDU2NzhAb3JkZXItbWFuYWdlbWVudC1kYi0wLm9yZGVyLW1hbmFnZW1lbnQtZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsOjI3MDE3L2FkbWluP3JlcGxpY2FTZXQ9b3JkZXItbWFuYWdlbWVudC1kYiZzc2w9ZmFsc2U=
+    connectionString.standardSrv: bW9uZ29kYitzcnY6Ly9teS11c2VyOjEyMzQ1Njc4QG9yZGVyLW1hbmFnZW1lbnQtZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsL2FkbWluP3JlcGxpY2FTZXQ9b3JkZXItbWFuYWdlbWVudC1kYiZzc2w9ZmFsc2U=
+    password: MTIzNDU2Nzg=
+    username: bXktdXNlcg==
+  kind: Secret
+  metadata:
+    name: order-management-db-admin-my-user
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    password: UHdDQk9DdEdXcHhfTm55UEpmY3A=
+  kind: Secret
+  metadata:
+    name: order-management-db-agent-password
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    cluster-config.json: eyJ2ZXJzaW9uIjoxLCJwcm9jZXNzZXMiOlt7Im5hbWUiOiJvcmRlci1tYW5hZ2VtZW50LWRiLTAiLCJkaXNhYmxlZCI6ZmFsc2UsImhvc3RuYW1lIjoib3JkZXItbWFuYWdlbWVudC1kYi0wLm9yZGVyLW1hbmFnZW1lbnQtZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsIiwiYXJnczJfNiI6eyJuZXQiOnsicG9ydCI6MjcwMTd9LCJyZXBsaWNhdGlvbiI6eyJyZXBsU2V0TmFtZSI6Im9yZGVyLW1hbmFnZW1lbnQtZGIifSwic3RvcmFnZSI6eyJkYlBhdGgiOiIvZGF0YSIsIndpcmVkVGlnZXIiOnsiZW5naW5lQ29uZmlnIjp7ImpvdXJuYWxDb21wcmVzc29yIjoiemxpYiJ9fX19LCJmZWF0dXJlQ29tcGF0aWJpbGl0eVZlcnNpb24iOiI2LjAiLCJwcm9jZXNzVHlwZSI6Im1vbmdvZCIsInZlcnNpb24iOiI2LjAuNSIsImF1dGhTY2hlbWFWZXJzaW9uIjo1LCJMb2dSb3RhdGUiOnsidGltZVRocmVzaG9sZEhycyI6MCwic2l6ZVRocmVzaG9sZE1CIjowfX1dLCJyZXBsaWNhU2V0cyI6W3siX2lkIjoib3JkZXItbWFuYWdlbWVudC1kYiIsIm1lbWJlcnMiOlt7Il9pZCI6MCwiaG9zdCI6Im9yZGVyLW1hbmFnZW1lbnQtZGItMCIsImFyYml0ZXJPbmx5IjpmYWxzZSwidm90ZXMiOjEsInByaW9yaXR5IjoxfV0sInByb3RvY29sVmVyc2lvbiI6IjEiLCJudW1iZXJBcmJpdGVycyI6MH1dLCJhdXRoIjp7InVzZXJzV2FudGVkIjpbeyJtZWNoYW5pc21zIjpbXSwicm9sZXMiOlt7InJvbGUiOiJjbHVzdGVyQWRtaW4iLCJkYiI6ImFkbWluIn0seyJyb2xlIjoidXNlckFkbWluQW55RGF0YWJhc2UiLCJkYiI6ImFkbWluIn1dLCJ1c2VyIjoibXktdXNlciIsImRiIjoiYWRtaW4iLCJhdXRoZW50aWNhdGlvblJlc3RyaWN0aW9ucyI6W10sInNjcmFtU2hhMjU2Q3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjE1MDAwLCJzYWx0IjoiYWpuK3BlOUo5UkJPVlZ4SmlkVWFHVmxqOXFDQ3FKNDZ4NHJ5cmc9PSIsInNlcnZlcktleSI6InladUFOUXV3UEk0NjdJUEZLaXMvMG5SV25jSkhIQTUxYnl4R1JadHlVNFk9Iiwic3RvcmVkS2V5IjoiRXBiUzJVWW1vMWQ2WUt2MTdLUTl0TExsbWZETEhXWVNIakVLL0FmN2J1Yz0ifSwic2NyYW1TaGExQ3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjEwMDAwLCJzYWx0IjoiWENYQ1dkTUdLWU1CbU5hRnlSZHJFZz09Iiwic2VydmVyS2V5IjoiQlltaURFTzNWRG9wQ3FqY0VBMzZnS1p5aVVFPSIsInN0b3JlZEtleSI6InJMWU1aU3RSdHVncE5mbzFBUDJmdm1jTVZ4MD0ifX1dLCJkaXNhYmxlZCI6ZmFsc2UsImF1dGhvcml0YXRpdmVTZXQiOmZhbHNlLCJhdXRvQXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvQXV0aE1lY2hhbmlzbSI6IlNDUkFNLVNIQS0yNTYiLCJkZXBsb3ltZW50QXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvVXNlciI6Im1tcy1hdXRvbWF0aW9uIiwia2V5IjoiVTA5RnFwSU1zRzB0dy9mb2MxQWpOQUFRdWhPRlVGTnk1bzlnTkR0ZnNLa29jU2VLMEhyOUNuR3l0NFpuVDNicnBhUU5wZFV0eWxGa0xWK25KY0xDcEl5a0oyamovZ3RDdzgvcitlanJwek9pQTR1ZVlsWm9ySzl0QS9ocmlyMStzdVdJN0FWNGNCaklMMmVydyt3TTM0bTdlSTJXRnp4UHJDY2h2RmRXSmZNcGY2dGJobzZvR0VpcmxzY1hKT05zYTYySGxnT3o1RXRVRE01eHFURU9LM1BxYzR2eFhkRENyTnRYVFd2aTFtdVdwNEdQRlVGQVY0Y2NhNjJkU2h1UlpCRk01YTF2U09CZGNpYVRKQ1VMSFlqbGpyYzYyMjN0aUN0N0ZIME1ZdE4vcjNHTmx3Tjd1VlBjZ0Ivb0sxTm9BRlRIRENsaEM3dmdlQjJ0dTArQllxblNPRFduN2pPMXl2VlhnMmgzeGhGZWJ6UkUyaCtQd3VkQ2FvNGJXREVLVVNUZEtGNkkxSjhMdEphQTgycFd4TE82RWloMU1KNXhKSFMyOHVJMUtrR1RsNlZ5MHpTdVBacE5pR3J3cDEyZjBVV3JnZHI0VEpjSjg3MUpuNlgzQ3hoYmdBaG5xWmZHWjh1NnRhUWhsdWlYaHdSOUtvNzVvVHhlUjlocUN3RnlMMzhHK3dlMEpoVXBmTVZpYmEzejF4eWhidkptTTJjVlp4c2dSQ3FKV0IxekFSNkhFd09DUVM5bEs4ajNkL050eC9RUlduQnVGN0dFVFdGM1FJTzNDQk5sR0J5YWdKSndoaUc5aVhXQ2ZmbFlkbk01MHV0aEI2b2ZhcUJqK2xNTEI5SmlVbmtmME1rbEp0Zko3ZHl3VHFad3BGQT0iLCJrZXlmaWxlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbi9hdXRoZW50aWNhdGlvbi9rZXlmaWxlIiwia2V5ZmlsZVdpbmRvd3MiOiIlU3lzdGVtRHJpdmUlXFxNTVNBdXRvbWF0aW9uXFx2ZXJzaW9uc1xca2V5ZmlsZSIsImF1dG9Qd2QiOiJQd0NCT0N0R1dweF9ObnlQSmZjcCJ9LCJ0bHMiOnsiQ0FGaWxlUGF0aCI6IiIsImNsaWVudENlcnRpZmljYXRlTW9kZSI6Ik9QVElPTkFMIn0sIm1vbmdvRGJWZXJzaW9ucyI6W3sibmFtZSI6IjYuMC41IiwiYnVpbGRzIjpbeyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFtZDY0IiwiZmxhdm9yIjoicmhlbCIsIm1pbk9zVmVyc2lvbiI6IiIsIm1heE9zVmVyc2lvbiI6IiIsIm1vZHVsZXMiOltdfSx7InBsYXRmb3JtIjoibGludXgiLCJ1cmwiOiIiLCJnaXRWZXJzaW9uIjoiIiwiYXJjaGl0ZWN0dXJlIjoiYW1kNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJyaGVsIiwibWluT3NWZXJzaW9uIjoiIiwibWF4T3NWZXJzaW9uIjoiIiwibW9kdWxlcyI6W119XX1dLCJiYWNrdXBWZXJzaW9ucyI6W10sIm1vbml0b3JpbmdWZXJzaW9ucyI6W10sIm9wdGlvbnMiOnsiZG93bmxvYWRCYXNlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbiJ9fQ==
+  kind: Secret
+  metadata:
+    name: order-management-db-config
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    keyfile: VTA5RnFwSU1zRzB0dy9mb2MxQWpOQUFRdWhPRlVGTnk1bzlnTkR0ZnNLa29jU2VLMEhyOUNuR3l0NFpuVDNicnBhUU5wZFV0eWxGa0xWK25KY0xDcEl5a0oyamovZ3RDdzgvcitlanJwek9pQTR1ZVlsWm9ySzl0QS9ocmlyMStzdVdJN0FWNGNCaklMMmVydyt3TTM0bTdlSTJXRnp4UHJDY2h2RmRXSmZNcGY2dGJobzZvR0VpcmxzY1hKT05zYTYySGxnT3o1RXRVRE01eHFURU9LM1BxYzR2eFhkRENyTnRYVFd2aTFtdVdwNEdQRlVGQVY0Y2NhNjJkU2h1UlpCRk01YTF2U09CZGNpYVRKQ1VMSFlqbGpyYzYyMjN0aUN0N0ZIME1ZdE4vcjNHTmx3Tjd1VlBjZ0Ivb0sxTm9BRlRIRENsaEM3dmdlQjJ0dTArQllxblNPRFduN2pPMXl2VlhnMmgzeGhGZWJ6UkUyaCtQd3VkQ2FvNGJXREVLVVNUZEtGNkkxSjhMdEphQTgycFd4TE82RWloMU1KNXhKSFMyOHVJMUtrR1RsNlZ5MHpTdVBacE5pR3J3cDEyZjBVV3JnZHI0VEpjSjg3MUpuNlgzQ3hoYmdBaG5xWmZHWjh1NnRhUWhsdWlYaHdSOUtvNzVvVHhlUjlocUN3RnlMMzhHK3dlMEpoVXBmTVZpYmEzejF4eWhidkptTTJjVlp4c2dSQ3FKV0IxekFSNkhFd09DUVM5bEs4ajNkL050eC9RUlduQnVGN0dFVFdGM1FJTzNDQk5sR0J5YWdKSndoaUc5aVhXQ2ZmbFlkbk01MHV0aEI2b2ZhcUJqK2xNTEI5SmlVbmtmME1rbEp0Zko3ZHl3VHFad3BGQT0=
+  kind: Secret
+  metadata:
+    name: order-management-db-keyfile
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    connectionString.standard: bW9uZ29kYjovL215LXVzZXI6MTIzNDU2NzhAcGF5bWVudC1wcm9jZXNzaW5nLWRiLTAucGF5bWVudC1wcm9jZXNzaW5nLWRiLXN2Yy5kYXRhYmFzZS5zdmMuY2x1c3Rlci5sb2NhbDoyNzAxNy9hZG1pbj9yZXBsaWNhU2V0PXBheW1lbnQtcHJvY2Vzc2luZy1kYiZzc2w9ZmFsc2U=
+    connectionString.standardSrv: bW9uZ29kYitzcnY6Ly9teS11c2VyOjEyMzQ1Njc4QHBheW1lbnQtcHJvY2Vzc2luZy1kYi1zdmMuZGF0YWJhc2Uuc3ZjLmNsdXN0ZXIubG9jYWwvYWRtaW4/cmVwbGljYVNldD1wYXltZW50LXByb2Nlc3NpbmctZGImc3NsPWZhbHNl
+    password: MTIzNDU2Nzg=
+    username: bXktdXNlcg==
+  kind: Secret
+  metadata:
+    name: payment-processing-db-admin-my-user
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    password: LTZLWlpOZWhwQ2F6WE1hN1F2TjY=
+  kind: Secret
+  metadata:
+    name: payment-processing-db-agent-password
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    cluster-config.json: eyJ2ZXJzaW9uIjoxLCJwcm9jZXNzZXMiOlt7Im5hbWUiOiJwYXltZW50LXByb2Nlc3NpbmctZGItMCIsImRpc2FibGVkIjpmYWxzZSwiaG9zdG5hbWUiOiJwYXltZW50LXByb2Nlc3NpbmctZGItMC5wYXltZW50LXByb2Nlc3NpbmctZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsIiwiYXJnczJfNiI6eyJuZXQiOnsicG9ydCI6MjcwMTd9LCJyZXBsaWNhdGlvbiI6eyJyZXBsU2V0TmFtZSI6InBheW1lbnQtcHJvY2Vzc2luZy1kYiJ9LCJzdG9yYWdlIjp7ImRiUGF0aCI6Ii9kYXRhIiwid2lyZWRUaWdlciI6eyJlbmdpbmVDb25maWciOnsiam91cm5hbENvbXByZXNzb3IiOiJ6bGliIn19fX0sImZlYXR1cmVDb21wYXRpYmlsaXR5VmVyc2lvbiI6IjYuMCIsInByb2Nlc3NUeXBlIjoibW9uZ29kIiwidmVyc2lvbiI6IjYuMC41IiwiYXV0aFNjaGVtYVZlcnNpb24iOjUsIkxvZ1JvdGF0ZSI6eyJ0aW1lVGhyZXNob2xkSHJzIjowLCJzaXplVGhyZXNob2xkTUIiOjB9fV0sInJlcGxpY2FTZXRzIjpbeyJfaWQiOiJwYXltZW50LXByb2Nlc3NpbmctZGIiLCJtZW1iZXJzIjpbeyJfaWQiOjAsImhvc3QiOiJwYXltZW50LXByb2Nlc3NpbmctZGItMCIsImFyYml0ZXJPbmx5IjpmYWxzZSwidm90ZXMiOjEsInByaW9yaXR5IjoxfV0sInByb3RvY29sVmVyc2lvbiI6IjEiLCJudW1iZXJBcmJpdGVycyI6MH1dLCJhdXRoIjp7InVzZXJzV2FudGVkIjpbeyJtZWNoYW5pc21zIjpbXSwicm9sZXMiOlt7InJvbGUiOiJjbHVzdGVyQWRtaW4iLCJkYiI6ImFkbWluIn0seyJyb2xlIjoidXNlckFkbWluQW55RGF0YWJhc2UiLCJkYiI6ImFkbWluIn1dLCJ1c2VyIjoibXktdXNlciIsImRiIjoiYWRtaW4iLCJhdXRoZW50aWNhdGlvblJlc3RyaWN0aW9ucyI6W10sInNjcmFtU2hhMjU2Q3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjE1MDAwLCJzYWx0IjoiYWpuK3BlOUo5UkJPVlZ4SmlkVWFHVmxqOXFDQ3FKNDZ4NHJ5cmc9PSIsInNlcnZlcktleSI6InladUFOUXV3UEk0NjdJUEZLaXMvMG5SV25jSkhIQTUxYnl4R1JadHlVNFk9Iiwic3RvcmVkS2V5IjoiRXBiUzJVWW1vMWQ2WUt2MTdLUTl0TExsbWZETEhXWVNIakVLL0FmN2J1Yz0ifSwic2NyYW1TaGExQ3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjEwMDAwLCJzYWx0IjoiWENYQ1dkTUdLWU1CbU5hRnlSZHJFZz09Iiwic2VydmVyS2V5IjoiQlltaURFTzNWRG9wQ3FqY0VBMzZnS1p5aVVFPSIsInN0b3JlZEtleSI6InJMWU1aU3RSdHVncE5mbzFBUDJmdm1jTVZ4MD0ifX1dLCJkaXNhYmxlZCI6ZmFsc2UsImF1dGhvcml0YXRpdmVTZXQiOmZhbHNlLCJhdXRvQXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvQXV0aE1lY2hhbmlzbSI6IlNDUkFNLVNIQS0yNTYiLCJkZXBsb3ltZW50QXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvVXNlciI6Im1tcy1hdXRvbWF0aW9uIiwia2V5IjoiUVZXckkrVG9KOS9xa0hwSzVNdkMxZEZFY1JFUlIwbmhXQTN6L25CeHJUYW5aNnprN3FIWG85enJIaVJNa1NmYWVySWk2ZHViWWdxQVF3VTNIMS9MNm1PR0V3dWRTK0hlNnhnOXpWRDFyMkljcis5KzVxMEpqK1BtZHc4OXF0RTY1TFJYTThWb0RFQmY0TkR2eXVNNFBWeHBUbDZ5WDBLTi9SZm9KVXF1S1JseGtzU1M2WnBNKzA2R3grVHVtMlJQNElmelJmZmVMVTBGemt6ZjZLbmp0SnpaMVFsRVNRN29EOG9kV3JSdWRiTlhRSFhzdTNGUUg5VTdTR3ZmSnQxa2tpUXFWaWZPMFd6SHV0R2F4OUdTUmdDNFRCWkpudVlqSks0N0hKUUJXalBMSU5KTXFlVHJhaVpVMUFTclozRW1wSEVsWU9vRUwwZjRPLzdEZGRxT2xwVlY3QlhsOEZyTitQcExoUkkxY050V3EvaFlsVHhVN3c4UEhtOUdwVm8wRWMvdlljY2hyK1JCN3lJdGRYQXNNKzEyNEoybjN4T3RETjBxejFLdkFDMXhGeWxncTYrUVRQaXpxenV3QjhLc2xmVUlkUHYxY21ialZWeTVFOVNDeWljaGNuSUlWNEpJRkpidEptdHc4K2pLWjBxMG5ET05KNmVhYXZ5clY5THNPZGFad1dSaWdBQjMwem1kNFNhU25jMXFVdFZyMVEzZkh2QlBrYjBoMWVSNVI3UTAwYy9ZbUI5OGpEc0QwcTZ3NmdXM1JkU0laZ2o1Sy9rblY4bDVHQ0JxZTRZMzUxdUFzamF5TVhZOXA0OEFadUhFZlVhcUZmc2J6ekkyMjI2UHp0blZRZGdIa2huNWxTU0ZtblRnbmRkZ0o2az0iLCJrZXlmaWxlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbi9hdXRoZW50aWNhdGlvbi9rZXlmaWxlIiwia2V5ZmlsZVdpbmRvd3MiOiIlU3lzdGVtRHJpdmUlXFxNTVNBdXRvbWF0aW9uXFx2ZXJzaW9uc1xca2V5ZmlsZSIsImF1dG9Qd2QiOiItNktaWk5laHBDYXpYTWE3UXZONiJ9LCJ0bHMiOnsiQ0FGaWxlUGF0aCI6IiIsImNsaWVudENlcnRpZmljYXRlTW9kZSI6Ik9QVElPTkFMIn0sIm1vbmdvRGJWZXJzaW9ucyI6W3sibmFtZSI6IjYuMC41IiwiYnVpbGRzIjpbeyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFtZDY0IiwiZmxhdm9yIjoicmhlbCIsIm1pbk9zVmVyc2lvbiI6IiIsIm1heE9zVmVyc2lvbiI6IiIsIm1vZHVsZXMiOltdfSx7InBsYXRmb3JtIjoibGludXgiLCJ1cmwiOiIiLCJnaXRWZXJzaW9uIjoiIiwiYXJjaGl0ZWN0dXJlIjoiYW1kNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJyaGVsIiwibWluT3NWZXJzaW9uIjoiIiwibWF4T3NWZXJzaW9uIjoiIiwibW9kdWxlcyI6W119XX1dLCJiYWNrdXBWZXJzaW9ucyI6W10sIm1vbml0b3JpbmdWZXJzaW9ucyI6W10sIm9wdGlvbnMiOnsiZG93bmxvYWRCYXNlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbiJ9fQ==
+  kind: Secret
+  metadata:
+    name: payment-processing-db-config
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    keyfile: UVZXckkrVG9KOS9xa0hwSzVNdkMxZEZFY1JFUlIwbmhXQTN6L25CeHJUYW5aNnprN3FIWG85enJIaVJNa1NmYWVySWk2ZHViWWdxQVF3VTNIMS9MNm1PR0V3dWRTK0hlNnhnOXpWRDFyMkljcis5KzVxMEpqK1BtZHc4OXF0RTY1TFJYTThWb0RFQmY0TkR2eXVNNFBWeHBUbDZ5WDBLTi9SZm9KVXF1S1JseGtzU1M2WnBNKzA2R3grVHVtMlJQNElmelJmZmVMVTBGemt6ZjZLbmp0SnpaMVFsRVNRN29EOG9kV3JSdWRiTlhRSFhzdTNGUUg5VTdTR3ZmSnQxa2tpUXFWaWZPMFd6SHV0R2F4OUdTUmdDNFRCWkpudVlqSks0N0hKUUJXalBMSU5KTXFlVHJhaVpVMUFTclozRW1wSEVsWU9vRUwwZjRPLzdEZGRxT2xwVlY3QlhsOEZyTitQcExoUkkxY050V3EvaFlsVHhVN3c4UEhtOUdwVm8wRWMvdlljY2hyK1JCN3lJdGRYQXNNKzEyNEoybjN4T3RETjBxejFLdkFDMXhGeWxncTYrUVRQaXpxenV3QjhLc2xmVUlkUHYxY21ialZWeTVFOVNDeWljaGNuSUlWNEpJRkpidEptdHc4K2pLWjBxMG5ET05KNmVhYXZ5clY5THNPZGFad1dSaWdBQjMwem1kNFNhU25jMXFVdFZyMVEzZkh2QlBrYjBoMWVSNVI3UTAwYy9ZbUI5OGpEc0QwcTZ3NmdXM1JkU0laZ2o1Sy9rblY4bDVHQ0JxZTRZMzUxdUFzamF5TVhZOXA0OEFadUhFZlVhcUZmc2J6ekkyMjI2UHp0blZRZGdIa2huNWxTU0ZtblRnbmRkZ0o2az0=
+  kind: Secret
+  metadata:
+    name: payment-processing-db-keyfile
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    connectionString.standard: bW9uZ29kYjovL215LXVzZXI6MTIzNDU2NzhAcHJvZHVjdC1jYXRhbG9nLWRiLTAucHJvZHVjdC1jYXRhbG9nLWRiLXN2Yy5kYXRhYmFzZS5zdmMuY2x1c3Rlci5sb2NhbDoyNzAxNy9hZG1pbj9yZXBsaWNhU2V0PXByb2R1Y3QtY2F0YWxvZy1kYiZzc2w9ZmFsc2U=
+    connectionString.standardSrv: bW9uZ29kYitzcnY6Ly9teS11c2VyOjEyMzQ1Njc4QHByb2R1Y3QtY2F0YWxvZy1kYi1zdmMuZGF0YWJhc2Uuc3ZjLmNsdXN0ZXIubG9jYWwvYWRtaW4/cmVwbGljYVNldD1wcm9kdWN0LWNhdGFsb2ctZGImc3NsPWZhbHNl
+    password: MTIzNDU2Nzg=
+    username: bXktdXNlcg==
+  kind: Secret
+  metadata:
+    name: product-catalog-db-admin-my-user
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    password: dGotbUpmaXdWZDg0emU4SGVVN04=
+  kind: Secret
+  metadata:
+    name: product-catalog-db-agent-password
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    cluster-config.json: eyJ2ZXJzaW9uIjoxLCJwcm9jZXNzZXMiOlt7Im5hbWUiOiJwcm9kdWN0LWNhdGFsb2ctZGItMCIsImRpc2FibGVkIjpmYWxzZSwiaG9zdG5hbWUiOiJwcm9kdWN0LWNhdGFsb2ctZGItMC5wcm9kdWN0LWNhdGFsb2ctZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsIiwiYXJnczJfNiI6eyJuZXQiOnsicG9ydCI6MjcwMTd9LCJyZXBsaWNhdGlvbiI6eyJyZXBsU2V0TmFtZSI6InByb2R1Y3QtY2F0YWxvZy1kYiJ9LCJzdG9yYWdlIjp7ImRiUGF0aCI6Ii9kYXRhIiwid2lyZWRUaWdlciI6eyJlbmdpbmVDb25maWciOnsiam91cm5hbENvbXByZXNzb3IiOiJ6bGliIn19fX0sImZlYXR1cmVDb21wYXRpYmlsaXR5VmVyc2lvbiI6IjYuMCIsInByb2Nlc3NUeXBlIjoibW9uZ29kIiwidmVyc2lvbiI6IjYuMC41IiwiYXV0aFNjaGVtYVZlcnNpb24iOjUsIkxvZ1JvdGF0ZSI6eyJ0aW1lVGhyZXNob2xkSHJzIjowLCJzaXplVGhyZXNob2xkTUIiOjB9fV0sInJlcGxpY2FTZXRzIjpbeyJfaWQiOiJwcm9kdWN0LWNhdGFsb2ctZGIiLCJtZW1iZXJzIjpbeyJfaWQiOjAsImhvc3QiOiJwcm9kdWN0LWNhdGFsb2ctZGItMCIsImFyYml0ZXJPbmx5IjpmYWxzZSwidm90ZXMiOjEsInByaW9yaXR5IjoxfV0sInByb3RvY29sVmVyc2lvbiI6IjEiLCJudW1iZXJBcmJpdGVycyI6MH1dLCJhdXRoIjp7InVzZXJzV2FudGVkIjpbeyJtZWNoYW5pc21zIjpbXSwicm9sZXMiOlt7InJvbGUiOiJjbHVzdGVyQWRtaW4iLCJkYiI6ImFkbWluIn0seyJyb2xlIjoidXNlckFkbWluQW55RGF0YWJhc2UiLCJkYiI6ImFkbWluIn1dLCJ1c2VyIjoibXktdXNlciIsImRiIjoiYWRtaW4iLCJhdXRoZW50aWNhdGlvblJlc3RyaWN0aW9ucyI6W10sInNjcmFtU2hhMjU2Q3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjE1MDAwLCJzYWx0IjoiYWpuK3BlOUo5UkJPVlZ4SmlkVWFHVmxqOXFDQ3FKNDZ4NHJ5cmc9PSIsInNlcnZlcktleSI6InladUFOUXV3UEk0NjdJUEZLaXMvMG5SV25jSkhIQTUxYnl4R1JadHlVNFk9Iiwic3RvcmVkS2V5IjoiRXBiUzJVWW1vMWQ2WUt2MTdLUTl0TExsbWZETEhXWVNIakVLL0FmN2J1Yz0ifSwic2NyYW1TaGExQ3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjEwMDAwLCJzYWx0IjoiWENYQ1dkTUdLWU1CbU5hRnlSZHJFZz09Iiwic2VydmVyS2V5IjoiQlltaURFTzNWRG9wQ3FqY0VBMzZnS1p5aVVFPSIsInN0b3JlZEtleSI6InJMWU1aU3RSdHVncE5mbzFBUDJmdm1jTVZ4MD0ifX1dLCJkaXNhYmxlZCI6ZmFsc2UsImF1dGhvcml0YXRpdmVTZXQiOmZhbHNlLCJhdXRvQXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvQXV0aE1lY2hhbmlzbSI6IlNDUkFNLVNIQS0yNTYiLCJkZXBsb3ltZW50QXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvVXNlciI6Im1tcy1hdXRvbWF0aW9uIiwia2V5IjoiUzVhdXBsUVpuVlFJUGtNYkIvSXhsOUZTZmkrcTh4T1hMTU9nZCtrUFBNRGlqTEUxZVpGQzBUaG5qZlk4WUgxeE51anhDMzg0cUhycXZVcFRta01aSXB3NjVOSm11WmNYREJBaTVhTWdmK3pPc3BKajM0cnBzTDZCYWVjelhVVGVXcys1V2Fqa1Q2cmU4NW9ZOE5OVnkxUDNZRmZ3ejBpcTJOQlZBalFJVmF2MlJXMTBxVElrVTJSRTQ2azdYNW5yZXRxSzZZWjV1YUduL0tOR1RKMTF4TmlsU2tFd005RDFQWXd1cktZa25ydlN3RElONWhNeVJvNXJGeGw1Sk8rR0xsbmZWTTZ1ZFpPeGVrd2xPOEdZbnlDTnNmWWF1Mzc4dWZFelhrOGFkMnpTZmNnUFVYUkhMOGlySXN1VmxLMUtmT3JUbmtGWEVJWHFCbUxGeDJHL0NtalI5cUVUTjUwZkgxNm1tT0d1R0pTWHpTNGRIaDd4dFYxRnJiK2VleGpud2RyT2F0c01Ia2V4M1VTQWdleFFmSjQ5bGtadFVEZUUzVk9YWXU0NythTHBlbml5Qlp4Q3RrSUFNVU41bFpid1RiOTVuanlUVGM0NjRPc3pnSGFzUkZhazR1VFBrMlRUbitzNDh2SWhEZU02aHVhdVhLdjNRY2tjNU5kUVprNFJkMjlqWVhEbDlBVDV1WDhFZlVDMXpiNXRxUUNnOG5PbEM4RXpubHhJN1h6N29ESEZWME5DSHozTk9STHhiMldYeUF6THVMTXlFdVFKNnRJdXlpZzc1QUdDcGRCRHNjUHBDcHpZdHdGRnJ4djBMQ3UvdXhzZkRTTmJWSk12L3ZRV1RIekRTK3RudlNvanV2RUxwM0RyOVZYK29KZz0iLCJrZXlmaWxlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbi9hdXRoZW50aWNhdGlvbi9rZXlmaWxlIiwia2V5ZmlsZVdpbmRvd3MiOiIlU3lzdGVtRHJpdmUlXFxNTVNBdXRvbWF0aW9uXFx2ZXJzaW9uc1xca2V5ZmlsZSIsImF1dG9Qd2QiOiJ0ai1tSmZpd1ZkODR6ZThIZVU3TiJ9LCJ0bHMiOnsiQ0FGaWxlUGF0aCI6IiIsImNsaWVudENlcnRpZmljYXRlTW9kZSI6Ik9QVElPTkFMIn0sIm1vbmdvRGJWZXJzaW9ucyI6W3sibmFtZSI6IjYuMC41IiwiYnVpbGRzIjpbeyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFtZDY0IiwiZmxhdm9yIjoicmhlbCIsIm1pbk9zVmVyc2lvbiI6IiIsIm1heE9zVmVyc2lvbiI6IiIsIm1vZHVsZXMiOltdfSx7InBsYXRmb3JtIjoibGludXgiLCJ1cmwiOiIiLCJnaXRWZXJzaW9uIjoiIiwiYXJjaGl0ZWN0dXJlIjoiYW1kNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJyaGVsIiwibWluT3NWZXJzaW9uIjoiIiwibWF4T3NWZXJzaW9uIjoiIiwibW9kdWxlcyI6W119XX1dLCJiYWNrdXBWZXJzaW9ucyI6W10sIm1vbml0b3JpbmdWZXJzaW9ucyI6W10sIm9wdGlvbnMiOnsiZG93bmxvYWRCYXNlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbiJ9fQ==
+  kind: Secret
+  metadata:
+    name: product-catalog-db-config
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    keyfile: UzVhdXBsUVpuVlFJUGtNYkIvSXhsOUZTZmkrcTh4T1hMTU9nZCtrUFBNRGlqTEUxZVpGQzBUaG5qZlk4WUgxeE51anhDMzg0cUhycXZVcFRta01aSXB3NjVOSm11WmNYREJBaTVhTWdmK3pPc3BKajM0cnBzTDZCYWVjelhVVGVXcys1V2Fqa1Q2cmU4NW9ZOE5OVnkxUDNZRmZ3ejBpcTJOQlZBalFJVmF2MlJXMTBxVElrVTJSRTQ2azdYNW5yZXRxSzZZWjV1YUduL0tOR1RKMTF4TmlsU2tFd005RDFQWXd1cktZa25ydlN3RElONWhNeVJvNXJGeGw1Sk8rR0xsbmZWTTZ1ZFpPeGVrd2xPOEdZbnlDTnNmWWF1Mzc4dWZFelhrOGFkMnpTZmNnUFVYUkhMOGlySXN1VmxLMUtmT3JUbmtGWEVJWHFCbUxGeDJHL0NtalI5cUVUTjUwZkgxNm1tT0d1R0pTWHpTNGRIaDd4dFYxRnJiK2VleGpud2RyT2F0c01Ia2V4M1VTQWdleFFmSjQ5bGtadFVEZUUzVk9YWXU0NythTHBlbml5Qlp4Q3RrSUFNVU41bFpid1RiOTVuanlUVGM0NjRPc3pnSGFzUkZhazR1VFBrMlRUbitzNDh2SWhEZU02aHVhdVhLdjNRY2tjNU5kUVprNFJkMjlqWVhEbDlBVDV1WDhFZlVDMXpiNXRxUUNnOG5PbEM4RXpubHhJN1h6N29ESEZWME5DSHozTk9STHhiMldYeUF6THVMTXlFdVFKNnRJdXlpZzc1QUdDcGRCRHNjUHBDcHpZdHdGRnJ4djBMQ3UvdXhzZkRTTmJWSk12L3ZRV1RIekRTK3RudlNvanV2RUxwM0RyOVZYK29KZz0=
+  kind: Secret
+  metadata:
+    name: product-catalog-db-keyfile
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    connectionString.standard: bW9uZ29kYjovL215LXVzZXI6MTIzNDU2NzhAcmV2aWV3LWFuZC1yYXRpbmctZGItMC5yZXZpZXctYW5kLXJhdGluZy1kYi1zdmMuZGF0YWJhc2Uuc3ZjLmNsdXN0ZXIubG9jYWw6MjcwMTcvYWRtaW4/cmVwbGljYVNldD1yZXZpZXctYW5kLXJhdGluZy1kYiZzc2w9ZmFsc2U=
+    connectionString.standardSrv: bW9uZ29kYitzcnY6Ly9teS11c2VyOjEyMzQ1Njc4QHJldmlldy1hbmQtcmF0aW5nLWRiLXN2Yy5kYXRhYmFzZS5zdmMuY2x1c3Rlci5sb2NhbC9hZG1pbj9yZXBsaWNhU2V0PXJldmlldy1hbmQtcmF0aW5nLWRiJnNzbD1mYWxzZQ==
+    password: MTIzNDU2Nzg=
+    username: bXktdXNlcg==
+  kind: Secret
+  metadata:
+    name: review-and-rating-db-admin-my-user
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    password: MFNoUm5FQi1xSVpDcTZMTlBfYkE=
+  kind: Secret
+  metadata:
+    name: review-and-rating-db-agent-password
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    cluster-config.json: eyJ2ZXJzaW9uIjoxLCJwcm9jZXNzZXMiOlt7Im5hbWUiOiJyZXZpZXctYW5kLXJhdGluZy1kYi0wIiwiZGlzYWJsZWQiOmZhbHNlLCJob3N0bmFtZSI6InJldmlldy1hbmQtcmF0aW5nLWRiLTAucmV2aWV3LWFuZC1yYXRpbmctZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsIiwiYXJnczJfNiI6eyJuZXQiOnsicG9ydCI6MjcwMTd9LCJyZXBsaWNhdGlvbiI6eyJyZXBsU2V0TmFtZSI6InJldmlldy1hbmQtcmF0aW5nLWRiIn0sInN0b3JhZ2UiOnsiZGJQYXRoIjoiL2RhdGEiLCJ3aXJlZFRpZ2VyIjp7ImVuZ2luZUNvbmZpZyI6eyJqb3VybmFsQ29tcHJlc3NvciI6InpsaWIifX19fSwiZmVhdHVyZUNvbXBhdGliaWxpdHlWZXJzaW9uIjoiNi4wIiwicHJvY2Vzc1R5cGUiOiJtb25nb2QiLCJ2ZXJzaW9uIjoiNi4wLjUiLCJhdXRoU2NoZW1hVmVyc2lvbiI6NSwiTG9nUm90YXRlIjp7InRpbWVUaHJlc2hvbGRIcnMiOjAsInNpemVUaHJlc2hvbGRNQiI6MH19XSwicmVwbGljYVNldHMiOlt7Il9pZCI6InJldmlldy1hbmQtcmF0aW5nLWRiIiwibWVtYmVycyI6W3siX2lkIjowLCJob3N0IjoicmV2aWV3LWFuZC1yYXRpbmctZGItMCIsImFyYml0ZXJPbmx5IjpmYWxzZSwidm90ZXMiOjEsInByaW9yaXR5IjoxfV0sInByb3RvY29sVmVyc2lvbiI6IjEiLCJudW1iZXJBcmJpdGVycyI6MH1dLCJhdXRoIjp7InVzZXJzV2FudGVkIjpbeyJtZWNoYW5pc21zIjpbXSwicm9sZXMiOlt7InJvbGUiOiJjbHVzdGVyQWRtaW4iLCJkYiI6ImFkbWluIn0seyJyb2xlIjoidXNlckFkbWluQW55RGF0YWJhc2UiLCJkYiI6ImFkbWluIn1dLCJ1c2VyIjoibXktdXNlciIsImRiIjoiYWRtaW4iLCJhdXRoZW50aWNhdGlvblJlc3RyaWN0aW9ucyI6W10sInNjcmFtU2hhMjU2Q3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjE1MDAwLCJzYWx0IjoiYWpuK3BlOUo5UkJPVlZ4SmlkVWFHVmxqOXFDQ3FKNDZ4NHJ5cmc9PSIsInNlcnZlcktleSI6InladUFOUXV3UEk0NjdJUEZLaXMvMG5SV25jSkhIQTUxYnl4R1JadHlVNFk9Iiwic3RvcmVkS2V5IjoiRXBiUzJVWW1vMWQ2WUt2MTdLUTl0TExsbWZETEhXWVNIakVLL0FmN2J1Yz0ifSwic2NyYW1TaGExQ3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjEwMDAwLCJzYWx0IjoiWENYQ1dkTUdLWU1CbU5hRnlSZHJFZz09Iiwic2VydmVyS2V5IjoiQlltaURFTzNWRG9wQ3FqY0VBMzZnS1p5aVVFPSIsInN0b3JlZEtleSI6InJMWU1aU3RSdHVncE5mbzFBUDJmdm1jTVZ4MD0ifX1dLCJkaXNhYmxlZCI6ZmFsc2UsImF1dGhvcml0YXRpdmVTZXQiOmZhbHNlLCJhdXRvQXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvQXV0aE1lY2hhbmlzbSI6IlNDUkFNLVNIQS0yNTYiLCJkZXBsb3ltZW50QXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvVXNlciI6Im1tcy1hdXRvbWF0aW9uIiwia2V5IjoiMU1obEQxKzJOUExFVmpybXdEaXRHN2svM2Q2bGcxZjJGbmlaSE9vUEUrN3pQMGdna3pSc0ZoOHcxYm1tNU1OMjQyNEMwTFNtd2hhMGkwRUZJcU9BRkE3ZDRVSDBoMnE2YmgxSDVyVWt3Qlc5eHdqUkxmNldrUEtTZjQ0NnJsdVlZaEVDYXU1VFAwUlRsclpuYi9DM3NZNittQ0crTUZOQzZvN3h6S1JXUjNMWXBKYkxUUnk1OFBveHdKWDBPZzZacjllNmlFc3d3QlJURGN2Tkc2c2hXbkxUSXQ5TWczUktJWEs0blJHUGQyNG05cmRUakVST1JxeDJud1ZPM2Q4SDJaTkM3akJxODE5OTJmcTUxbnk0d1pnQzBYdEFZWVRweTVRMjZnbjR6MmNNdkVCQzdOVXByU1phQ056K0FwU29hK0R5ZmlEcDdVM2doQThrKytYUkZ6TnQ1WUVLY1Y2VnIrZ3pkZzFIaGwrNDVabmlLbmI2cTlKT2ZIVld5cWd1NTNMOElyUjFBTFhwN3I0VXRPUjB0UVdVTERYMElwUEYxWi9TVkt1ZVpQWkxXTFVxSnZubjlBVENFWWxUU2RLOUJkejFBZmNCSEFaMGcvcXpXZ3ZpL1k5aDQycFN4N0cyd3gvNjZxUUZ3V04zZHkyeFl2d1JxZTcyRksweVc3ZWFXM0hKSHBmYVVvQTNQVTJUNmROdjJkM3kybDNFUFZqeGRpUkRmYTFRWWZNc3pxb3dJaEcrTXJOYkdpNWNTeWxpcU9zS3c1TnEzNURNWFEwdFlLSllJREhVSE1EOThiVDZUa0FZQVBEc1Jyc2tla2h0WCtTVVNBT3NUb0F1Q0g0MHFqRk44MTJwT0Mwa2UzbXdNZVczUXcyelVOQT0iLCJrZXlmaWxlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbi9hdXRoZW50aWNhdGlvbi9rZXlmaWxlIiwia2V5ZmlsZVdpbmRvd3MiOiIlU3lzdGVtRHJpdmUlXFxNTVNBdXRvbWF0aW9uXFx2ZXJzaW9uc1xca2V5ZmlsZSIsImF1dG9Qd2QiOiIwU2hSbkVCLXFJWkNxNkxOUF9iQSJ9LCJ0bHMiOnsiQ0FGaWxlUGF0aCI6IiIsImNsaWVudENlcnRpZmljYXRlTW9kZSI6Ik9QVElPTkFMIn0sIm1vbmdvRGJWZXJzaW9ucyI6W3sibmFtZSI6IjYuMC41IiwiYnVpbGRzIjpbeyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFtZDY0IiwiZmxhdm9yIjoicmhlbCIsIm1pbk9zVmVyc2lvbiI6IiIsIm1heE9zVmVyc2lvbiI6IiIsIm1vZHVsZXMiOltdfSx7InBsYXRmb3JtIjoibGludXgiLCJ1cmwiOiIiLCJnaXRWZXJzaW9uIjoiIiwiYXJjaGl0ZWN0dXJlIjoiYW1kNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJyaGVsIiwibWluT3NWZXJzaW9uIjoiIiwibWF4T3NWZXJzaW9uIjoiIiwibW9kdWxlcyI6W119XX1dLCJiYWNrdXBWZXJzaW9ucyI6W10sIm1vbml0b3JpbmdWZXJzaW9ucyI6W10sIm9wdGlvbnMiOnsiZG93bmxvYWRCYXNlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbiJ9fQ==
+  kind: Secret
+  metadata:
+    name: review-and-rating-db-config
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    keyfile: MU1obEQxKzJOUExFVmpybXdEaXRHN2svM2Q2bGcxZjJGbmlaSE9vUEUrN3pQMGdna3pSc0ZoOHcxYm1tNU1OMjQyNEMwTFNtd2hhMGkwRUZJcU9BRkE3ZDRVSDBoMnE2YmgxSDVyVWt3Qlc5eHdqUkxmNldrUEtTZjQ0NnJsdVlZaEVDYXU1VFAwUlRsclpuYi9DM3NZNittQ0crTUZOQzZvN3h6S1JXUjNMWXBKYkxUUnk1OFBveHdKWDBPZzZacjllNmlFc3d3QlJURGN2Tkc2c2hXbkxUSXQ5TWczUktJWEs0blJHUGQyNG05cmRUakVST1JxeDJud1ZPM2Q4SDJaTkM3akJxODE5OTJmcTUxbnk0d1pnQzBYdEFZWVRweTVRMjZnbjR6MmNNdkVCQzdOVXByU1phQ056K0FwU29hK0R5ZmlEcDdVM2doQThrKytYUkZ6TnQ1WUVLY1Y2VnIrZ3pkZzFIaGwrNDVabmlLbmI2cTlKT2ZIVld5cWd1NTNMOElyUjFBTFhwN3I0VXRPUjB0UVdVTERYMElwUEYxWi9TVkt1ZVpQWkxXTFVxSnZubjlBVENFWWxUU2RLOUJkejFBZmNCSEFaMGcvcXpXZ3ZpL1k5aDQycFN4N0cyd3gvNjZxUUZ3V04zZHkyeFl2d1JxZTcyRksweVc3ZWFXM0hKSHBmYVVvQTNQVTJUNmROdjJkM3kybDNFUFZqeGRpUkRmYTFRWWZNc3pxb3dJaEcrTXJOYkdpNWNTeWxpcU9zS3c1TnEzNURNWFEwdFlLSllJREhVSE1EOThiVDZUa0FZQVBEc1Jyc2tla2h0WCtTVVNBT3NUb0F1Q0g0MHFqRk44MTJwT0Mwa2UzbXdNZVczUXcyelVOQT0=
+  kind: Secret
+  metadata:
+    name: review-and-rating-db-keyfile
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    connectionString.standard: bW9uZ29kYjovL215LXVzZXI6MTIzNDU2NzhAc2hpcHBpbmctYW5kLWxvZ2lzdGljcy1kYi0wLnNoaXBwaW5nLWFuZC1sb2dpc3RpY3MtZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsOjI3MDE3L2FkbWluP3JlcGxpY2FTZXQ9c2hpcHBpbmctYW5kLWxvZ2lzdGljcy1kYiZzc2w9ZmFsc2U=
+    connectionString.standardSrv: bW9uZ29kYitzcnY6Ly9teS11c2VyOjEyMzQ1Njc4QHNoaXBwaW5nLWFuZC1sb2dpc3RpY3MtZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsL2FkbWluP3JlcGxpY2FTZXQ9c2hpcHBpbmctYW5kLWxvZ2lzdGljcy1kYiZzc2w9ZmFsc2U=
+    password: MTIzNDU2Nzg=
+    username: bXktdXNlcg==
+  kind: Secret
+  metadata:
+    name: shipping-and-logistics-db-admin-my-user
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    password: LXFRY3VTSEtSRXVCRHEweV9wakI=
+  kind: Secret
+  metadata:
+    name: shipping-and-logistics-db-agent-password
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    cluster-config.json: eyJ2ZXJzaW9uIjoxLCJwcm9jZXNzZXMiOlt7Im5hbWUiOiJzaGlwcGluZy1hbmQtbG9naXN0aWNzLWRiLTAiLCJkaXNhYmxlZCI6ZmFsc2UsImhvc3RuYW1lIjoic2hpcHBpbmctYW5kLWxvZ2lzdGljcy1kYi0wLnNoaXBwaW5nLWFuZC1sb2dpc3RpY3MtZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsIiwiYXJnczJfNiI6eyJuZXQiOnsicG9ydCI6MjcwMTd9LCJyZXBsaWNhdGlvbiI6eyJyZXBsU2V0TmFtZSI6InNoaXBwaW5nLWFuZC1sb2dpc3RpY3MtZGIifSwic3RvcmFnZSI6eyJkYlBhdGgiOiIvZGF0YSIsIndpcmVkVGlnZXIiOnsiZW5naW5lQ29uZmlnIjp7ImpvdXJuYWxDb21wcmVzc29yIjoiemxpYiJ9fX19LCJmZWF0dXJlQ29tcGF0aWJpbGl0eVZlcnNpb24iOiI2LjAiLCJwcm9jZXNzVHlwZSI6Im1vbmdvZCIsInZlcnNpb24iOiI2LjAuNSIsImF1dGhTY2hlbWFWZXJzaW9uIjo1LCJMb2dSb3RhdGUiOnsidGltZVRocmVzaG9sZEhycyI6MCwic2l6ZVRocmVzaG9sZE1CIjowfX1dLCJyZXBsaWNhU2V0cyI6W3siX2lkIjoic2hpcHBpbmctYW5kLWxvZ2lzdGljcy1kYiIsIm1lbWJlcnMiOlt7Il9pZCI6MCwiaG9zdCI6InNoaXBwaW5nLWFuZC1sb2dpc3RpY3MtZGItMCIsImFyYml0ZXJPbmx5IjpmYWxzZSwidm90ZXMiOjEsInByaW9yaXR5IjoxfV0sInByb3RvY29sVmVyc2lvbiI6IjEiLCJudW1iZXJBcmJpdGVycyI6MH1dLCJhdXRoIjp7InVzZXJzV2FudGVkIjpbeyJtZWNoYW5pc21zIjpbXSwicm9sZXMiOlt7InJvbGUiOiJjbHVzdGVyQWRtaW4iLCJkYiI6ImFkbWluIn0seyJyb2xlIjoidXNlckFkbWluQW55RGF0YWJhc2UiLCJkYiI6ImFkbWluIn1dLCJ1c2VyIjoibXktdXNlciIsImRiIjoiYWRtaW4iLCJhdXRoZW50aWNhdGlvblJlc3RyaWN0aW9ucyI6W10sInNjcmFtU2hhMjU2Q3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjE1MDAwLCJzYWx0IjoiYWpuK3BlOUo5UkJPVlZ4SmlkVWFHVmxqOXFDQ3FKNDZ4NHJ5cmc9PSIsInNlcnZlcktleSI6InladUFOUXV3UEk0NjdJUEZLaXMvMG5SV25jSkhIQTUxYnl4R1JadHlVNFk9Iiwic3RvcmVkS2V5IjoiRXBiUzJVWW1vMWQ2WUt2MTdLUTl0TExsbWZETEhXWVNIakVLL0FmN2J1Yz0ifSwic2NyYW1TaGExQ3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjEwMDAwLCJzYWx0IjoiWENYQ1dkTUdLWU1CbU5hRnlSZHJFZz09Iiwic2VydmVyS2V5IjoiQlltaURFTzNWRG9wQ3FqY0VBMzZnS1p5aVVFPSIsInN0b3JlZEtleSI6InJMWU1aU3RSdHVncE5mbzFBUDJmdm1jTVZ4MD0ifX1dLCJkaXNhYmxlZCI6ZmFsc2UsImF1dGhvcml0YXRpdmVTZXQiOmZhbHNlLCJhdXRvQXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvQXV0aE1lY2hhbmlzbSI6IlNDUkFNLVNIQS0yNTYiLCJkZXBsb3ltZW50QXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvVXNlciI6Im1tcy1hdXRvbWF0aW9uIiwia2V5IjoiaDFqK1FSTkxQWTQxeFJJRS94NjhvRml1VzN3OXd0b3lZRitYbmVwUGF0UUw5RGUzS0lBdnNRcUF4Y2p6UVpsV0I0UkxsR00weU5qNlJCbjN4KytLd0d2eFNuSUVPZVF0VU1WNzhqNHhMSU11ZWF0eWZxWXE3OGlEb0taWFgrbDJWWkZmV2cvQ0J3cUhWRGkwVE9HSXZHRC9PNllxQlJhdlF0Smh4QlFzSmtML2J3NWdQaHk0NkhCbVdqczR5Nlg4VDRaeXFPTDltKzZqYzk0S0hNMXZ6OUNTcWJmL3l4SkE4K3ZHZTBlWGN2VWpBWk5ncTRmbzNFV1dGMTRtb2szOS95LzhVZWY1WFlSZEFRYXMwQmhKSXBUeUZ6QldhMFNsTExhbGZlOEtqeWlNTUV1eGZqS1RNVWo0YTVtZHZHNDVSczRabWxYRzA4cHQweVozZzAxVmduU1gyRG42OHNySDdtbVpWTWZoUmZSOTRjU1ZjTW5jcTNYeHRZVUs0VzNMUk83dkpxeWgzdzFZSXBUVnh0ajJIM0NHQUo2QUE1bkhEbi92NThTSXY3T1lCdVdNa0VTcUpNNVo5VHR1OU9LUFZTUlk2YnhLVWhvWEQ5ZVEwZnBRZlZzblVya2JGR3AyMkZsSlZkWjVaOWgvTWttQUM3TDkzbmoxWXo3Z0tFeDROdlE5bnp2NWJ0bWpKZk5PenhIYVBqRTBpd05zeVhTQVVlWG5RT3RhclA0d01ST2JBSnlSOVRPM0M5UjZIaXY1YXFSbUZHUExoTnpFa2tuNmFaZXhKbVYwUkFWZzljczBBay80L0ZpaERjUE5PUUh2aFVEdDJNMU1nNnlub1JVUnJSN2NEbTlVaGFZelgwbjAzRVY1ZDhsS0owOD0iLCJrZXlmaWxlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbi9hdXRoZW50aWNhdGlvbi9rZXlmaWxlIiwia2V5ZmlsZVdpbmRvd3MiOiIlU3lzdGVtRHJpdmUlXFxNTVNBdXRvbWF0aW9uXFx2ZXJzaW9uc1xca2V5ZmlsZSIsImF1dG9Qd2QiOiItcVFjdVNIS1JFdUJEcTB5X3BqQiJ9LCJ0bHMiOnsiQ0FGaWxlUGF0aCI6IiIsImNsaWVudENlcnRpZmljYXRlTW9kZSI6Ik9QVElPTkFMIn0sIm1vbmdvRGJWZXJzaW9ucyI6W3sibmFtZSI6IjYuMC41IiwiYnVpbGRzIjpbeyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFtZDY0IiwiZmxhdm9yIjoicmhlbCIsIm1pbk9zVmVyc2lvbiI6IiIsIm1heE9zVmVyc2lvbiI6IiIsIm1vZHVsZXMiOltdfSx7InBsYXRmb3JtIjoibGludXgiLCJ1cmwiOiIiLCJnaXRWZXJzaW9uIjoiIiwiYXJjaGl0ZWN0dXJlIjoiYW1kNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJyaGVsIiwibWluT3NWZXJzaW9uIjoiIiwibWF4T3NWZXJzaW9uIjoiIiwibW9kdWxlcyI6W119XX1dLCJiYWNrdXBWZXJzaW9ucyI6W10sIm1vbml0b3JpbmdWZXJzaW9ucyI6W10sIm9wdGlvbnMiOnsiZG93bmxvYWRCYXNlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbiJ9fQ==
+  kind: Secret
+  metadata:
+    name: shipping-and-logistics-db-config
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    keyfile: aDFqK1FSTkxQWTQxeFJJRS94NjhvRml1VzN3OXd0b3lZRitYbmVwUGF0UUw5RGUzS0lBdnNRcUF4Y2p6UVpsV0I0UkxsR00weU5qNlJCbjN4KytLd0d2eFNuSUVPZVF0VU1WNzhqNHhMSU11ZWF0eWZxWXE3OGlEb0taWFgrbDJWWkZmV2cvQ0J3cUhWRGkwVE9HSXZHRC9PNllxQlJhdlF0Smh4QlFzSmtML2J3NWdQaHk0NkhCbVdqczR5Nlg4VDRaeXFPTDltKzZqYzk0S0hNMXZ6OUNTcWJmL3l4SkE4K3ZHZTBlWGN2VWpBWk5ncTRmbzNFV1dGMTRtb2szOS95LzhVZWY1WFlSZEFRYXMwQmhKSXBUeUZ6QldhMFNsTExhbGZlOEtqeWlNTUV1eGZqS1RNVWo0YTVtZHZHNDVSczRabWxYRzA4cHQweVozZzAxVmduU1gyRG42OHNySDdtbVpWTWZoUmZSOTRjU1ZjTW5jcTNYeHRZVUs0VzNMUk83dkpxeWgzdzFZSXBUVnh0ajJIM0NHQUo2QUE1bkhEbi92NThTSXY3T1lCdVdNa0VTcUpNNVo5VHR1OU9LUFZTUlk2YnhLVWhvWEQ5ZVEwZnBRZlZzblVya2JGR3AyMkZsSlZkWjVaOWgvTWttQUM3TDkzbmoxWXo3Z0tFeDROdlE5bnp2NWJ0bWpKZk5PenhIYVBqRTBpd05zeVhTQVVlWG5RT3RhclA0d01ST2JBSnlSOVRPM0M5UjZIaXY1YXFSbUZHUExoTnpFa2tuNmFaZXhKbVYwUkFWZzljczBBay80L0ZpaERjUE5PUUh2aFVEdDJNMU1nNnlub1JVUnJSN2NEbTlVaGFZelgwbjAzRVY1ZDhsS0owOD0=
+  kind: Secret
+  metadata:
+    name: shipping-and-logistics-db-keyfile
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    connectionString.standard: bW9uZ29kYjovL215LXVzZXI6MTIzNDU2NzhAdXNlci1hY2NvdW50LWRiLTAudXNlci1hY2NvdW50LWRiLXN2Yy5kYXRhYmFzZS5zdmMuY2x1c3Rlci5sb2NhbDoyNzAxNy9hZG1pbj9yZXBsaWNhU2V0PXVzZXItYWNjb3VudC1kYiZzc2w9ZmFsc2U=
+    connectionString.standardSrv: bW9uZ29kYitzcnY6Ly9teS11c2VyOjEyMzQ1Njc4QHVzZXItYWNjb3VudC1kYi1zdmMuZGF0YWJhc2Uuc3ZjLmNsdXN0ZXIubG9jYWwvYWRtaW4/cmVwbGljYVNldD11c2VyLWFjY291bnQtZGImc3NsPWZhbHNl
+    password: MTIzNDU2Nzg=
+    username: bXktdXNlcg==
+  kind: Secret
+  metadata:
+    name: user-account-db-admin-my-user
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    password: T2pvVGJWTEgxQnQxZXQ5V2RIY0k=
+  kind: Secret
+  metadata:
+    name: user-account-db-agent-password
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    cluster-config.json: eyJ2ZXJzaW9uIjoxLCJwcm9jZXNzZXMiOlt7Im5hbWUiOiJ1c2VyLWFjY291bnQtZGItMCIsImRpc2FibGVkIjpmYWxzZSwiaG9zdG5hbWUiOiJ1c2VyLWFjY291bnQtZGItMC51c2VyLWFjY291bnQtZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsIiwiYXJnczJfNiI6eyJuZXQiOnsicG9ydCI6MjcwMTd9LCJyZXBsaWNhdGlvbiI6eyJyZXBsU2V0TmFtZSI6InVzZXItYWNjb3VudC1kYiJ9LCJzdG9yYWdlIjp7ImRiUGF0aCI6Ii9kYXRhIiwid2lyZWRUaWdlciI6eyJlbmdpbmVDb25maWciOnsiam91cm5hbENvbXByZXNzb3IiOiJ6bGliIn19fX0sImZlYXR1cmVDb21wYXRpYmlsaXR5VmVyc2lvbiI6IjYuMCIsInByb2Nlc3NUeXBlIjoibW9uZ29kIiwidmVyc2lvbiI6IjYuMC41IiwiYXV0aFNjaGVtYVZlcnNpb24iOjUsIkxvZ1JvdGF0ZSI6eyJ0aW1lVGhyZXNob2xkSHJzIjowLCJzaXplVGhyZXNob2xkTUIiOjB9fV0sInJlcGxpY2FTZXRzIjpbeyJfaWQiOiJ1c2VyLWFjY291bnQtZGIiLCJtZW1iZXJzIjpbeyJfaWQiOjAsImhvc3QiOiJ1c2VyLWFjY291bnQtZGItMCIsImFyYml0ZXJPbmx5IjpmYWxzZSwidm90ZXMiOjEsInByaW9yaXR5IjoxfV0sInByb3RvY29sVmVyc2lvbiI6IjEiLCJudW1iZXJBcmJpdGVycyI6MH1dLCJhdXRoIjp7InVzZXJzV2FudGVkIjpbeyJtZWNoYW5pc21zIjpbXSwicm9sZXMiOlt7InJvbGUiOiJjbHVzdGVyQWRtaW4iLCJkYiI6ImFkbWluIn0seyJyb2xlIjoidXNlckFkbWluQW55RGF0YWJhc2UiLCJkYiI6ImFkbWluIn1dLCJ1c2VyIjoibXktdXNlciIsImRiIjoiYWRtaW4iLCJhdXRoZW50aWNhdGlvblJlc3RyaWN0aW9ucyI6W10sInNjcmFtU2hhMjU2Q3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjE1MDAwLCJzYWx0IjoiYWpuK3BlOUo5UkJPVlZ4SmlkVWFHVmxqOXFDQ3FKNDZ4NHJ5cmc9PSIsInNlcnZlcktleSI6InladUFOUXV3UEk0NjdJUEZLaXMvMG5SV25jSkhIQTUxYnl4R1JadHlVNFk9Iiwic3RvcmVkS2V5IjoiRXBiUzJVWW1vMWQ2WUt2MTdLUTl0TExsbWZETEhXWVNIakVLL0FmN2J1Yz0ifSwic2NyYW1TaGExQ3JlZHMiOnsiaXRlcmF0aW9uQ291bnQiOjEwMDAwLCJzYWx0IjoiWENYQ1dkTUdLWU1CbU5hRnlSZHJFZz09Iiwic2VydmVyS2V5IjoiQlltaURFTzNWRG9wQ3FqY0VBMzZnS1p5aVVFPSIsInN0b3JlZEtleSI6InJMWU1aU3RSdHVncE5mbzFBUDJmdm1jTVZ4MD0ifX1dLCJkaXNhYmxlZCI6ZmFsc2UsImF1dGhvcml0YXRpdmVTZXQiOmZhbHNlLCJhdXRvQXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvQXV0aE1lY2hhbmlzbSI6IlNDUkFNLVNIQS0yNTYiLCJkZXBsb3ltZW50QXV0aE1lY2hhbmlzbXMiOlsiU0NSQU0tU0hBLTI1NiJdLCJhdXRvVXNlciI6Im1tcy1hdXRvbWF0aW9uIiwia2V5IjoiN2YybTlHSWRtWFFRa3VHMWQrT01QZitrKzA2dUxzbk5JSzJNTkxQWjJkK1J1cVZRR2pDMFBsRGV0RzdvNGZ4SlVOUDd3emdod3BNeXJiTUJLOFpUUmFEaFJXQXpERnlaVlNIRU9waUs2d1pLTjdYUVdIZE1oNXpNZHFYWWtDVjNEMG1LZ2x3NVJLTktWMWZyRVRHQVBGKzY0dXZoY2lINGI1cDkyTU0wVVc0Y0xsTHNEVnRndWw4U2c2b0g4UHZONVhqZC9qQkJjK3hjRkkwdFFENmN4eWlVWDJKRkNld3N5eXJ4WldHU2lHc1VRcXRNMjRQbmc1NVFVenV3Nk9GY3cwTDU2R0dhMi81Nzhhc24rNnJjdUQzMms3ajR5WDFHRjlVaFNPYW90N25ka0ljUGs4ZFM3VGJXQXhzdDA3WFdkNlZMSFNNdlpCenpIbVVkZGJwRDlTeG55WGpJOHMxS0lCeTlZMzFERmR6Zy9xNVZpNjFRajVFSTQxNGphWERYRXdET0s3WmV3L3VUdEY2TWxkNEpBR3d2Wk9vbk1nWWNPSXpnWDVYbVpPVUVSSkwxaFJZZVBvZWdobzBZVnVRbjJUWTA4c3NwWkJsaGlhK3k5MzIzcERpckN3ZWtjcGZpL2FXUmZiUEFQeWtWRGllUVg4cUQrUU0rMmJQYm1mUXhFd3pMYkVJUjV2U1ZrdmRmUXpnaFVXTHk3bVBGay9FNVFXZmFYeGkrMWE2cnpWdmtYZS8vTkpsMzdJcGxoK0EyTzhDL2hFcnNpcU10aE1hSUFsS3lnRk54QVNzeVJNb3o3a0pBbUdVTVpBL2RHMU5DT3dpdFdDT1hJVFBUdkRpOHZyME1vSW8yOHZjamNQU1NzQ0trTVRqa3I0UT0iLCJrZXlmaWxlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbi9hdXRoZW50aWNhdGlvbi9rZXlmaWxlIiwia2V5ZmlsZVdpbmRvd3MiOiIlU3lzdGVtRHJpdmUlXFxNTVNBdXRvbWF0aW9uXFx2ZXJzaW9uc1xca2V5ZmlsZSIsImF1dG9Qd2QiOiJPam9UYlZMSDFCdDFldDlXZEhjSSJ9LCJ0bHMiOnsiQ0FGaWxlUGF0aCI6IiIsImNsaWVudENlcnRpZmljYXRlTW9kZSI6Ik9QVElPTkFMIn0sIm1vbmdvRGJWZXJzaW9ucyI6W3sibmFtZSI6IjYuMC41IiwiYnVpbGRzIjpbeyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFtZDY0IiwiZmxhdm9yIjoicmhlbCIsIm1pbk9zVmVyc2lvbiI6IiIsIm1heE9zVmVyc2lvbiI6IiIsIm1vZHVsZXMiOltdfSx7InBsYXRmb3JtIjoibGludXgiLCJ1cmwiOiIiLCJnaXRWZXJzaW9uIjoiIiwiYXJjaGl0ZWN0dXJlIjoiYW1kNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJ1YnVudHUiLCJtaW5Pc1ZlcnNpb24iOiIiLCJtYXhPc1ZlcnNpb24iOiIiLCJtb2R1bGVzIjpbXX0seyJwbGF0Zm9ybSI6ImxpbnV4IiwidXJsIjoiIiwiZ2l0VmVyc2lvbiI6IiIsImFyY2hpdGVjdHVyZSI6ImFhcmNoNjQiLCJmbGF2b3IiOiJyaGVsIiwibWluT3NWZXJzaW9uIjoiIiwibWF4T3NWZXJzaW9uIjoiIiwibW9kdWxlcyI6W119XX1dLCJiYWNrdXBWZXJzaW9ucyI6W10sIm1vbml0b3JpbmdWZXJzaW9ucyI6W10sIm9wdGlvbnMiOnsiZG93bmxvYWRCYXNlIjoiL3Zhci9saWIvbW9uZ29kYi1tbXMtYXV0b21hdGlvbiJ9fQ==
+  kind: Secret
+  metadata:
+    name: user-account-db-config
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  data:
+    keyfile: N2YybTlHSWRtWFFRa3VHMWQrT01QZitrKzA2dUxzbk5JSzJNTkxQWjJkK1J1cVZRR2pDMFBsRGV0RzdvNGZ4SlVOUDd3emdod3BNeXJiTUJLOFpUUmFEaFJXQXpERnlaVlNIRU9waUs2d1pLTjdYUVdIZE1oNXpNZHFYWWtDVjNEMG1LZ2x3NVJLTktWMWZyRVRHQVBGKzY0dXZoY2lINGI1cDkyTU0wVVc0Y0xsTHNEVnRndWw4U2c2b0g4UHZONVhqZC9qQkJjK3hjRkkwdFFENmN4eWlVWDJKRkNld3N5eXJ4WldHU2lHc1VRcXRNMjRQbmc1NVFVenV3Nk9GY3cwTDU2R0dhMi81Nzhhc24rNnJjdUQzMms3ajR5WDFHRjlVaFNPYW90N25ka0ljUGs4ZFM3VGJXQXhzdDA3WFdkNlZMSFNNdlpCenpIbVVkZGJwRDlTeG55WGpJOHMxS0lCeTlZMzFERmR6Zy9xNVZpNjFRajVFSTQxNGphWERYRXdET0s3WmV3L3VUdEY2TWxkNEpBR3d2Wk9vbk1nWWNPSXpnWDVYbVpPVUVSSkwxaFJZZVBvZWdobzBZVnVRbjJUWTA4c3NwWkJsaGlhK3k5MzIzcERpckN3ZWtjcGZpL2FXUmZiUEFQeWtWRGllUVg4cUQrUU0rMmJQYm1mUXhFd3pMYkVJUjV2U1ZrdmRmUXpnaFVXTHk3bVBGay9FNVFXZmFYeGkrMWE2cnpWdmtYZS8vTkpsMzdJcGxoK0EyTzhDL2hFcnNpcU10aE1hSUFsS3lnRk54QVNzeVJNb3o3a0pBbUdVTVpBL2RHMU5DT3dpdFdDT1hJVFBUdkRpOHZyME1vSW8yOHZjamNQU1NzQ0trTVRqa3I0UT0=
+  kind: Secret
+  metadata:
+    name: user-account-db-keyfile
+    namespace: database
+  type: Opaque
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: order-management-db-svc
+    name: data-volume-order-management-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10G
+    storageClassName: hostpath
+    volumeName: pvc-f4a1d3c3-8b73-41ca-a866-083f4d5d5e37
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: payment-processing-db-svc
+    name: data-volume-payment-processing-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10G
+    storageClassName: hostpath
+    volumeName: pvc-4a9c438d-b256-41e5-a26a-f2c930a0f0c2
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: product-catalog-db-svc
+    name: data-volume-product-catalog-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10G
+    storageClassName: hostpath
+    volumeName: pvc-10cf25f7-1c22-4a09-a534-ad15ed27513c
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: review-and-rating-db-svc
+    name: data-volume-review-and-rating-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10G
+    storageClassName: hostpath
+    volumeName: pvc-8625265b-1a51-44dd-8015-ff8752251ac0
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: shipping-and-logistics-db-svc
+    name: data-volume-shipping-and-logistics-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10G
+    storageClassName: hostpath
+    volumeName: pvc-f9fde409-b9cb-4cd8-8090-98858ffaf218
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: user-account-db-svc
+    name: data-volume-user-account-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10G
+    storageClassName: hostpath
+    volumeName: pvc-b571c988-3a71-4c15-aa49-2febe10239e4
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: order-management-db-svc
+    name: logs-volume-order-management-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 2G
+    storageClassName: hostpath
+    volumeName: pvc-beba5343-0361-4341-8724-7ac981a4f3a3
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: payment-processing-db-svc
+    name: logs-volume-payment-processing-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 2G
+    storageClassName: hostpath
+    volumeName: pvc-505c126b-9f38-4c8f-abf6-1cbd5f481f3e
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: product-catalog-db-svc
+    name: logs-volume-product-catalog-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 2G
+    storageClassName: hostpath
+    volumeName: pvc-e0be9cb5-bfdb-4988-80ab-809cc094a8dd
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: review-and-rating-db-svc
+    name: logs-volume-review-and-rating-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 2G
+    storageClassName: hostpath
+    volumeName: pvc-4990aded-f6f2-493d-bb2d-e25919ceea5f
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: shipping-and-logistics-db-svc
+    name: logs-volume-shipping-and-logistics-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 2G
+    storageClassName: hostpath
+    volumeName: pvc-7f3703c4-aee7-4e30-8edb-5b78ce0c4160
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: docker.io/hostpath
+      volume.kubernetes.io/storage-provisioner: docker.io/hostpath
+    labels:
+      app: user-account-db-svc
+    name: logs-volume-user-account-db-0
+    namespace: database
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 2G
+    storageClassName: hostpath
+    volumeName: pvc-dc91c378-f3a6-4980-a93d-36bee3c3fad7
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: order-management-db
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: order-management-db-svc
+    serviceName: order-management-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: order-management-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: order-management-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: order-management-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: order-management-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: order-management-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: order-management-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: order-management-db-arb
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: order-management-db-svc
+    serviceName: order-management-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: order-management-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: order-management-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: order-management-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: order-management-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: order-management-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: order-management-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: payment-processing-db
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: payment-processing-db-svc
+    serviceName: payment-processing-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: payment-processing-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: payment-processing-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: payment-processing-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: payment-processing-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: payment-processing-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: payment-processing-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: payment-processing-db-arb
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: payment-processing-db-svc
+    serviceName: payment-processing-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: payment-processing-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: payment-processing-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: payment-processing-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: payment-processing-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: payment-processing-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: payment-processing-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: product-catalog-db
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: product-catalog-db-svc
+    serviceName: product-catalog-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: product-catalog-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: product-catalog-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: product-catalog-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: product-catalog-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: product-catalog-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: product-catalog-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: product-catalog-db-arb
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: product-catalog-db-svc
+    serviceName: product-catalog-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: product-catalog-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: product-catalog-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: product-catalog-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: product-catalog-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: product-catalog-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: product-catalog-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: review-and-rating-db
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: review-and-rating-db-svc
+    serviceName: review-and-rating-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: review-and-rating-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: review-and-rating-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: review-and-rating-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: review-and-rating-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: review-and-rating-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: review-and-rating-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: review-and-rating-db-arb
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: review-and-rating-db-svc
+    serviceName: review-and-rating-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: review-and-rating-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: review-and-rating-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: review-and-rating-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: review-and-rating-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: review-and-rating-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: review-and-rating-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: shipping-and-logistics-db
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: shipping-and-logistics-db-svc
+    serviceName: shipping-and-logistics-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: shipping-and-logistics-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: shipping-and-logistics-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: shipping-and-logistics-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: shipping-and-logistics-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: shipping-and-logistics-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: shipping-and-logistics-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: shipping-and-logistics-db-arb
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: shipping-and-logistics-db-svc
+    serviceName: shipping-and-logistics-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: shipping-and-logistics-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: shipping-and-logistics-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: shipping-and-logistics-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: shipping-and-logistics-db-keyfile
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: shipping-and-logistics-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: shipping-and-logistics-db-keyfile
+        - name: tmp
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: user-account-db
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: user-account-db-svc
+    serviceName: user-account-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: user-account-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: user-account-db-keyfile
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: user-account-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: user-account-db-keyfile
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: user-account-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: tmp
+        - name: user-account-db-keyfile
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: user-account-db-arb
+    namespace: database
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: user-account-db-svc
+    serviceName: user-account-db-svc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: user-account-db-svc
+      spec:
+        containers:
+        - args:
+          - ""
+          command:
+          - /bin/sh
+          - -c
+          - |2+
+
+            #run post-start hook to handle version changes
+            /hooks/version-upgrade
+
+            # wait for config and keyfile to be created by the agent
+             while ! [ -f /data/automation-mongod.conf -a -f /var/lib/mongodb-mms-automation/authentication/keyfile ]; do sleep 3 ; done ; sleep 2 ;
+
+            # start mongod with this configuration
+            exec mongod -f /data/automation-mongod.conf;
+
+          env:
+          - name: AGENT_STATUS_FILEPATH
+            value: /healthstatus/agent-health-status.json
+          image: quay.io/mongodb/mongodb-community-server:6.0.5-ubi8
+          imagePullPolicy: IfNotPresent
+          name: mongod
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /healthstatus
+            name: healthstatus
+          - mountPath: /hooks
+            name: hooks
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: user-account-db-keyfile
+        - command:
+          - /bin/bash
+          - -c
+          - |-
+            current_uid=$(id -u)
+            AGENT_API_KEY="$(cat /mongodb-automation/agent-api-key/agentApiKey)"
+            declare -r current_uid
+            if ! grep -q "${current_uid}" /etc/passwd ; then
+            sed -e "s/^mongodb:/builder:/" /etc/passwd > /tmp/passwd
+            echo "mongodb:x:$(id -u):$(id -g):,,,:/:/bin/bash" >> /tmp/passwd
+            export NSS_WRAPPER_PASSWD=/tmp/passwd
+            export LD_PRELOAD=libnss_wrapper.so
+            export NSS_WRAPPER_GROUP=/etc/group
+            fi
+            agent/mongodb-agent -healthCheckFilePath=/var/log/mongodb-mms-automation/healthstatus/agent-health-status.json -serveStatusPort=5000 -cluster=/var/lib/automation/config/cluster-config.json -skipMongoStart -noDaemonize -useLocalMongoDbTools -logFile ${AGENT_LOG_FILE} -maxLogFileDurationHrs ${AGENT_MAX_LOG_FILE_DURATION_HOURS} -logLevel ${AGENT_LOG_LEVEL}
+          env:
+          - name: AGENT_LOG_FILE
+            value: /var/log/mongodb-mms-automation/automation-agent.log
+          - name: AGENT_LOG_LEVEL
+            value: INFO
+          - name: AGENT_MAX_LOG_FILE_DURATION_HOURS
+            value: "24"
+          - name: AGENT_STATUS_FILEPATH
+            value: /var/log/mongodb-mms-automation/healthstatus/agent-health-status.json
+          - name: AUTOMATION_CONFIG_MAP
+            value: user-account-db-config
+          - name: HEADLESS_AGENT
+            value: "true"
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: quay.io/mongodb/mongodb-agent:107.0.0.8465-1
+          imagePullPolicy: Always
+          name: mongodb-agent
+          readinessProbe:
+            exec:
+              command:
+              - /opt/scripts/readinessprobe
+            failureThreshold: 40
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 400M
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+          - mountPath: /var/lib/automation/config
+            name: automation-config
+            readOnly: true
+          - mountPath: /data
+            name: data-volume
+          - mountPath: /var/log/mongodb-mms-automation/healthstatus
+            name: healthstatus
+          - mountPath: /var/log/mongodb-mms-automation
+            name: logs-volume
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /var/lib/mongodb-mms-automation/authentication
+            name: user-account-db-keyfile
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - version-upgrade-hook
+          - /hooks/version-upgrade
+          image: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.8
+          imagePullPolicy: Always
+          name: mongod-posthook
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /hooks
+            name: hooks
+        - command:
+          - cp
+          - /probes/readinessprobe
+          - /opt/scripts/readinessprobe
+          image: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.17
+          imagePullPolicy: Always
+          name: mongodb-agent-readinessprobe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/scripts
+            name: agent-scripts
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 2000
+          runAsNonRoot: true
+          runAsUser: 2000
+        serviceAccount: mongodb-database
+        serviceAccountName: mongodb-database
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: agent-scripts
+        - name: automation-config
+          secret:
+            defaultMode: 416
+            secretName: user-account-db-config
+        - name: healthstatus
+        - name: hooks
+        - name: tmp
+        - name: user-account-db-keyfile
+    updateStrategy:
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: logs-volume
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2G
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+kind: List
+metadata:
+  resourceVersion: ""

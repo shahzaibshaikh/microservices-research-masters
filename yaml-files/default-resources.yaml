@@ -1,0 +1,752 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: nats-deployment
+    namespace: default
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: nats
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: nats
+          skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+      spec:
+        containers:
+        - args:
+          - -p
+          - "4222"
+          - -m
+          - "8222"
+          - -hbi
+          - 5s
+          - -hbt
+          - 5s
+          - -hbf
+          - "2"
+          - -SD
+          - -cid
+          - microservices-research
+          image: nats-streaming:0.17.0
+          imagePullPolicy: IfNotPresent
+          name: nats
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        terminationGracePeriodSeconds: 30
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: order-management-depl
+    namespace: default
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: order-management
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: order-management
+          skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+      spec:
+        containers:
+        - env:
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: SECRET_KEY
+                name: jwt-secret
+          - name: MONGO_URI_ORDER
+            valueFrom:
+              secretKeyRef:
+                key: MONGO_URI_ORDER
+                name: mongo-uri-secret-order
+          image: shahzaibshaikh/order-management:cf26948ba51253b1a21acc91cbb41fd1c99e27137b818f263fa6ad5af18aff1e
+          imagePullPolicy: IfNotPresent
+          name: order-management
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        terminationGracePeriodSeconds: 30
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: payment-processing-depl
+    namespace: default
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: payment-processing
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: payment-processing
+          skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+      spec:
+        containers:
+        - env:
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: SECRET_KEY
+                name: jwt-secret
+          - name: MONGO_URI_PAYMENT
+            valueFrom:
+              secretKeyRef:
+                key: MONGO_URI_PAYMENT
+                name: mongo-uri-secret-payment
+          image: shahzaibshaikh/payment-processing:d557a291c2ec00df43a7ac34bc3fd859f221e38c50cdde337f8ff770c85708d7
+          imagePullPolicy: IfNotPresent
+          name: payment-processing
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        terminationGracePeriodSeconds: 30
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: product-catalog-depl
+    namespace: default
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: product-catalog
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: product-catalog
+          skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+      spec:
+        containers:
+        - env:
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: SECRET_KEY
+                name: jwt-secret
+          - name: MONGO_URI_PRODUCT
+            valueFrom:
+              secretKeyRef:
+                key: MONGO_URI_PRODUCT
+                name: mongo-uri-secret-product
+          image: shahzaibshaikh/product-catalog:5778c3f0a140c38a044d3ea9e0f12e232db820343b2cf3026ee6933e10169974
+          imagePullPolicy: IfNotPresent
+          name: product-catalog
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        terminationGracePeriodSeconds: 30
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: review-and-rating-depl
+    namespace: default
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: review-and-rating
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: review-and-rating
+          skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+      spec:
+        containers:
+        - env:
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: SECRET_KEY
+                name: jwt-secret
+          - name: MONGO_URI_REVIEW
+            valueFrom:
+              secretKeyRef:
+                key: MONGO_URI_REVIEW
+                name: mongo-uri-secret-review
+          image: shahzaibshaikh/review-and-rating:da0b01d488c5943bc9651a82e17f7cfe70cd7148e73e1b9fed5479fe4e38395a
+          imagePullPolicy: IfNotPresent
+          name: review-and-rating
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        terminationGracePeriodSeconds: 30
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: shipping-and-logistics-depl
+    namespace: default
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: shipping-and-logistics
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: shipping-and-logistics
+          skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+      spec:
+        containers:
+        - env:
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: SECRET_KEY
+                name: jwt-secret
+          - name: MONGO_URI_SHIPPING
+            valueFrom:
+              secretKeyRef:
+                key: MONGO_URI_SHIPPING
+                name: mongo-uri-secret-shipping
+          image: shahzaibshaikh/shipping-and-logistics:1e70a373c20a692e3f7649d55d6da069be33b26e5592c407ebb249a8b956f180
+          imagePullPolicy: IfNotPresent
+          name: shipping-and-logistics
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 200Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        terminationGracePeriodSeconds: 30
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "6"
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: user-account-depl
+    namespace: default
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 3
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: user-account
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: user-account
+          skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+      spec:
+        containers:
+        - env:
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: SECRET_KEY
+                name: jwt-secret
+          - name: MONGO_URI_USER
+            valueFrom:
+              secretKeyRef:
+                key: MONGO_URI_USER
+                name: mongo-uri-secret-user
+          image: shahzaibshaikh/user-account:e515483f3d8af9199a2ee21bbed18f896631e6c5ccfc81b406c2111364278a5c
+          imagePullPolicy: IfNotPresent
+          name: user-account
+          resources:
+            limits:
+              memory: 500Mi
+            requests:
+              memory: 300Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        terminationGracePeriodSeconds: 30
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      component: apiserver
+      provider: kubernetes
+    name: kubernetes
+    namespace: default
+  spec:
+    clusterIP: 10.96.0.1
+    clusterIPs:
+    - 10.96.0.1
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: https
+      port: 443
+      targetPort: 6443
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: nats-srv
+    namespace: default
+  spec:
+    clusterIP: 10.97.60.119
+    clusterIPs:
+    - 10.97.60.119
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: nats-client
+      port: 4222
+    - name: nats-monitoring
+      port: 8222
+    selector:
+      app: nats
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: order-management-srv
+    namespace: default
+  spec:
+    clusterIP: 10.96.31.191
+    clusterIPs:
+    - 10.96.31.191
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: order-management
+      port: 3003
+    selector:
+      app: order-management
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: payment-processing-srv
+    namespace: default
+  spec:
+    clusterIP: 10.107.62.107
+    clusterIPs:
+    - 10.107.62.107
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: payment-processing
+      port: 3004
+    selector:
+      app: payment-processing
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: product-catalog-srv
+    namespace: default
+  spec:
+    clusterIP: 10.99.148.173
+    clusterIPs:
+    - 10.99.148.173
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: product-catalog
+      port: 3001
+    selector:
+      app: product-catalog
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: review-and-rating-srv
+    namespace: default
+  spec:
+    clusterIP: 10.110.242.52
+    clusterIPs:
+    - 10.110.242.52
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: review-and-rating
+      port: 3002
+    selector:
+      app: review-and-rating
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: shipping-and-logistics-srv
+    namespace: default
+  spec:
+    clusterIP: 10.108.113.75
+    clusterIPs:
+    - 10.108.113.75
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: shipping-and-logistics
+      port: 3005
+    selector:
+      app: shipping-and-logistics
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      skaffold.dev/run-id: edc19f11-bb72-4c9f-a1f2-b0de476400a8
+    name: user-account-srv
+    namespace: default
+  spec:
+    clusterIP: 10.108.15.71
+    clusterIPs:
+    - 10.108.15.71
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: user-account
+      port: 3006
+    selector:
+      app: user-account
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIIH8EDJ9VGpfAwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNDAzMDQwNjI0NDRaFw0zNDAzMDIwNjI5NDRaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCo+Uh2PfFkLFYjtrE4wXnY+kkSD8E+sGSjO5eTK8H99gPbJ+v9oJvPRKb/
+      pVfPHxSODX+HTSUWLMZYo5z2499bjlZQ7hNN2JF8A0gJFlOAksNDA8PkalUpcwao
+      +YInlT5IlBT8+Opg08VS0N3YsoA2Unk+u9VL6gEKlarHZduVRlcY2blxreqYIG9i
+      uw3TF5nb9xKKvgAt8/HmllsZFE/uneZ9l2NLwXKbRXGlb/fdTOwDajbnJH3IaELM
+      RGLuzknVKUYEXXdM4ykYNByVamibsS//+Dz3VfMSyzEppSPbKLaMlX06YA5bEeLg
+      y05Unsa8V3DT8oR7TqHRuC2eYR3HAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBS7juCsW3HvdkYNKQqEljLtdnV4uTAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQBowtNpEflP
+      fhB+KBLvt+9qusV0vHvwlpt0j7at0hcqLYOi8unt5yks9obAWgffvPEjzDPHBKmb
+      crnXoTeP6Kb694m0VIooaAKrBWguVSmi1IS7DLFr1GgtwoXokHBZLMGoTDHxlrWo
+      LKU55oenaXt3CRCbo3DMCxzw9gO6GxWzUlk4gE16sFDqFb1oXc09R6/7IEBorqEf
+      AN6aNYmfg4R6pXFlMotduq2GmSpwfxTgZTJb6ZURttCvxNONZ4MzRBHZt/5bz51C
+      JyPPFA+LFdrLHXJamK15SVJJ9b9IE3nnDUbG/lFmXJHPJGbiokYWZFH58hm5gSn9
+      ElbQeAdCy3Mf
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: default
+- apiVersion: v1
+  data:
+    SECRET_KEY: MTJKTlM5OFVFMjNLSk5FS0pTTkRBOFM3SEVJVTMyTktK
+  kind: Secret
+  metadata:
+    name: jwt-secret
+    namespace: default
+  type: Opaque
+- apiVersion: v1
+  data:
+    MONGO_URI_ORDER: bW9uZ29kYjovL3NoYWh6YWlic2hhaWtoOnBhc3N3b3JkQG9yZGVyLW1hbmFnZW1lbnQtZGItMC5vcmRlci1tYW5hZ2VtZW50LWRiLXN2Yy5kYXRhYmFzZS5zdmMuY2x1c3Rlci5sb2NhbDoyNzAxNy9vcmRlcnM/cmVwbGljYVNldD1vcmRlci1tYW5hZ2VtZW50LWRiJnNzbD1mYWxzZSZhdXRoU291cmNlPW9yZGVycyZkaXJlY3RDb25uZWN0aW9uPXRydWUmYXV0aE1lY2hhbmlzbT1TQ1JBTS1TSEEtMjU2
+  kind: Secret
+  metadata:
+    name: mongo-uri-secret-order
+    namespace: default
+  type: Opaque
+- apiVersion: v1
+  data:
+    MONGO_URI_PAYMENT: bW9uZ29kYjovL3NoYWh6YWlic2hhaWtoOnBhc3N3b3JkQHBheW1lbnQtcHJvY2Vzc2luZy1kYi0wLnBheW1lbnQtcHJvY2Vzc2luZy1kYi1zdmMuZGF0YWJhc2Uuc3ZjLmNsdXN0ZXIubG9jYWw6MjcwMTcvcGF5bWVudHM/cmVwbGljYVNldD1wYXltZW50LXByb2Nlc3NpbmctZGImc3NsPWZhbHNlJmF1dGhTb3VyY2U9cGF5bWVudHMmZGlyZWN0Q29ubmVjdGlvbj10cnVlJmF1dGhNZWNoYW5pc209U0NSQU0tU0hBLTI1Ng==
+  kind: Secret
+  metadata:
+    name: mongo-uri-secret-payment
+    namespace: default
+  type: Opaque
+- apiVersion: v1
+  data:
+    MONGO_URI_PRODUCT: bW9uZ29kYjovL3NoYWh6YWlic2hhaWtoOnBhc3N3b3JkQHByb2R1Y3QtY2F0YWxvZy1kYi0wLnByb2R1Y3QtY2F0YWxvZy1kYi1zdmMuZGF0YWJhc2Uuc3ZjLmNsdXN0ZXIubG9jYWw6MjcwMTcvcHJvZHVjdHM/cmVwbGljYVNldD1wcm9kdWN0LWNhdGFsb2ctZGImc3NsPWZhbHNlJmF1dGhTb3VyY2U9cHJvZHVjdHMmZGlyZWN0Q29ubmVjdGlvbj10cnVlJmF1dGhNZWNoYW5pc209U0NSQU0tU0hBLTI1Ng==
+  kind: Secret
+  metadata:
+    name: mongo-uri-secret-product
+    namespace: default
+  type: Opaque
+- apiVersion: v1
+  data:
+    MONGO_URI_REVIEW: bW9uZ29kYjovL3NoYWh6YWlic2hhaWtoOnBhc3N3b3JkQHJldmlldy1hbmQtcmF0aW5nLWRiLTAucmV2aWV3LWFuZC1yYXRpbmctZGItc3ZjLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2FsOjI3MDE3L3Jldmlld3M/cmVwbGljYVNldD1yZXZpZXctYW5kLXJhdGluZy1kYiZzc2w9ZmFsc2UmYXV0aFNvdXJjZT1yZXZpZXdzJmRpcmVjdENvbm5lY3Rpb249dHJ1ZSZhdXRoTWVjaGFuaXNtPVNDUkFNLVNIQS0yNTY=
+  kind: Secret
+  metadata:
+    name: mongo-uri-secret-review
+    namespace: default
+  type: Opaque
+- apiVersion: v1
+  data:
+    MONGO_URI_SHIPPING: bW9uZ29kYjovL3NoYWh6YWlic2hhaWtoOnBhc3N3b3JkQHNoaXBwaW5nLWFuZC1sb2dpc3RpY3MtZGItMC5zaGlwcGluZy1hbmQtbG9naXN0aWNzLWRiLXN2Yy5kYXRhYmFzZS5zdmMuY2x1c3Rlci5sb2NhbDoyNzAxNy9zaGlwcGluZ3M/cmVwbGljYVNldD1zaGlwcGluZy1hbmQtbG9naXN0aWNzLWRiJnNzbD1mYWxzZSZhdXRoU291cmNlPXNoaXBwaW5ncyZkaXJlY3RDb25uZWN0aW9uPXRydWUmYXV0aE1lY2hhbmlzbT1TQ1JBTS1TSEEtMjU2
+  kind: Secret
+  metadata:
+    name: mongo-uri-secret-shipping
+    namespace: default
+  type: Opaque
+- apiVersion: v1
+  data:
+    MONGO_URI_USER: bW9uZ29kYjovL3NoYWh6YWlic2hhaWtoOnBhc3N3b3JkQHVzZXItYWNjb3VudC1kYi0wLnVzZXItYWNjb3VudC1kYi1zdmMuZGF0YWJhc2Uuc3ZjLmNsdXN0ZXIubG9jYWw6MjcwMTcvdXNlcnM/cmVwbGljYVNldD11c2VyLWFjY291bnQtZGImc3NsPWZhbHNlJmF1dGhTb3VyY2U9dXNlcnMmZGlyZWN0Q29ubmVjdGlvbj10cnVlJmF1dGhNZWNoYW5pc209U0NSQU0tU0hBLTI1Ng==
+  kind: Secret
+  metadata:
+    name: mongo-uri-secret-user
+    namespace: default
+  type: Opaque
+- apiVersion: v1
+  data:
+    ca: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJkVENDQVJ1Z0F3SUJBZ0lRQk9mZ3NNQ1h5M0xZSWNUNUdwQ0kzVEFLQmdncWhrak9QUVFEQWpBUE1RMHcKQ3dZRFZRUUtFd1J1YVd3eE1DQVhEVEkwTURReE1EQXhOVEF5TlZvWUR6SXhNalF3TXpFM01ERTFNREkxV2pBUApNUTB3Q3dZRFZRUUtFd1J1YVd3eE1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRW5odW1nbmlhCnV2bDF1clI4THVST0NnNTNqWHVzTTd6ckdrQU1pS0ozdkdqb0QydlBuNGhwdHFscTBqMW4zSHdPTUZlVE9FNE0KTDk4Z0EyQldlZXdPT0tOWE1GVXdEZ1lEVlIwUEFRSC9CQVFEQWdJRU1CTUdBMVVkSlFRTU1Bb0dDQ3NHQVFVRgpCd01CTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRk1YbGdURDJjeUZvOU8zYnNUWktXbnY4CmFpU2FNQW9HQ0NxR1NNNDlCQU1DQTBnQU1FVUNJUUNLM1JIRnNWMXNzR3FTc1NGMmQ2eWk2eE1IMCtBZmhIekcKeXJxaWU5NmFNZ0lnUkUwandwRlFzQ2JKR1NKb2JyTFBwVEcrU1J4em1sK2hQeFFUdElXbHNEND0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    cert: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUIwakNDQVhlZ0F3SUJBZ0lSQU9NeG1vOEJPYzYvdVdVQXFqV0h6OWN3Q2dZSUtvWkl6ajBFQXdJd0R6RU4KTUFzR0ExVUVDaE1FYm1sc01UQWdGdzB5TkRBME1UQXdNVFV3TWpWYUdBOHlNVEkwTURNeE56QXhOVEF5TlZvdwpEekVOTUFzR0ExVUVDaE1FYm1sc01qQlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJCbVRmanJoCnVMRVMyWHcxV21LTmc2UktSL0ZRZGhVbVpnYkxNWFFRbE9wVS9OZWM2VHRGSWpDR1FTM1AranRUVVREOHZod3gKcVY4T1ZhS0Q5ZXNJdmZlamdiRXdnYTR3RGdZRFZSMFBBUUgvQkFRREFnV2dNQk1HQTFVZEpRUU1NQW9HQ0NzRwpBUVVGQndNQk1Bd0dBMVVkRXdFQi93UUNNQUF3ZVFZRFZSMFJCSEl3Y0lJd2JtZHBibmd0YVc1bmNtVnpjeTFwCmJtZHlaWE56TFc1bmFXNTRMV052Ym5SeWIyeHNaWEl0WVdSdGFYTnphVzl1Z2p4dVoybHVlQzFwYm1keVpYTnoKTFdsdVozSmxjM010Ym1kcGJuZ3RZMjl1ZEhKdmJHeGxjaTFoWkcxcGMzTnBiMjR1WkdWbVlYVnNkQzV6ZG1NdwpDZ1lJS29aSXpqMEVBd0lEU1FBd1JnSWhBTzdKSmJPMEx1QXp3Qnl0bmRRa3ZLdU5rS2oxRWdyS0JhYXFYTmNwCmNGZ1ZBaUVBNkhWenpIR1FtSGJuQ21ZditiNkVZRE15TXJrdGMwVkpNZlg2VWU2ajU3OD0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    key: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUJDZkVuVk5EY2I3SUpzQkdhb1daZnJxa2YvTTZNT0hBdEYwcGFYVFNiVnNvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFR1pOK091RzRzUkxaZkRWYVlvMkRwRXBIOFZCMkZTWm1Cc3N4ZEJDVTZsVDgxNXpwTzBVaQpNSVpCTGMvNk8xTlJNUHkrSERHcFh3NVZvb1AxNndpOTl3PT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=
+  kind: Secret
+  metadata:
+    name: nginx-ingress-ingress-nginx-admission
+    namespace: default
+  type: Opaque
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+    name: ingress-service
+    namespace: default
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: microservices-bookstore.dev
+      http:
+        paths:
+        - backend:
+            service:
+              name: user-account-srv
+              port:
+                number: 3006
+          path: /api/users/.*
+          pathType: ImplementationSpecific
+        - backend:
+            service:
+              name: product-catalog-srv
+              port:
+                number: 3001
+          path: /api/products/.*
+          pathType: ImplementationSpecific
+        - backend:
+            service:
+              name: review-and-rating-srv
+              port:
+                number: 3002
+          path: /api/reviews/.*
+          pathType: ImplementationSpecific
+        - backend:
+            service:
+              name: order-management-srv
+              port:
+                number: 3003
+          path: /api/orders/.*
+          pathType: ImplementationSpecific
+        - backend:
+            service:
+              name: payment-processing-srv
+              port:
+                number: 3004
+          path: /api/payments/.*
+          pathType: ImplementationSpecific
+        - backend:
+            service:
+              name: shipping-and-logistics-srv
+              port:
+                number: 3005
+          path: /api/shipping/.*
+          pathType: ImplementationSpecific
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    name: ingress-srv
+    namespace: default
+  spec:
+    rules:
+    - host: microservices-bookstore.dev
+      http:
+        paths:
+        - backend:
+            service:
+              name: user-account-srv
+              port:
+                number: 80
+          path: /api/users/
+          pathType: Prefix
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    name: nginx
+    namespace: default
+  spec:
+    rules:
+    - host: your-app.example.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: your-service
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: user-account-cpu-hpa
+    namespace: default
+  spec:
+    maxReplicas: 3
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 40
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: user-account-depl
+kind: List
+metadata:
+  resourceVersion: ""
