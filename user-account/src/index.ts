@@ -37,7 +37,7 @@ const start = async () => {
   const PORT: number = 3006;
 
   app.listen(PORT, () => {
-    console.log(`UserAccount service running on port ${PORT}`);
+    console.log(`User Account service running on port ${PORT}`);
   });
 };
 
