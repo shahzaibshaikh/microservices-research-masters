@@ -92,7 +92,7 @@ items:
               secretKeyRef:
                 key: MONGO_URI_ORDER
                 name: mongo-uri-secret-order
-          image: shahzaibshaikh/order-management:cf26948ba51253b1a21acc91cbb41fd1c99e27137b818f263fa6ad5af18aff1e
+          image: shahzaibshaikh/order-management:latest
           imagePullPolicy: IfNotPresent
           name: order-management
           resources:
@@ -146,7 +146,7 @@ items:
               secretKeyRef:
                 key: MONGO_URI_PAYMENT
                 name: mongo-uri-secret-payment
-          image: shahzaibshaikh/payment-processing:d557a291c2ec00df43a7ac34bc3fd859f221e38c50cdde337f8ff770c85708d7
+          image: shahzaibshaikh/payment-processing:latest
           imagePullPolicy: IfNotPresent
           name: payment-processing
           resources:
@@ -200,7 +200,7 @@ items:
               secretKeyRef:
                 key: MONGO_URI_PRODUCT
                 name: mongo-uri-secret-product
-          image: shahzaibshaikh/product-catalog:5778c3f0a140c38a044d3ea9e0f12e232db820343b2cf3026ee6933e10169974
+          image: shahzaibshaikh/product-catalog:latest
           imagePullPolicy: IfNotPresent
           name: product-catalog
           resources:
@@ -254,7 +254,7 @@ items:
               secretKeyRef:
                 key: MONGO_URI_REVIEW
                 name: mongo-uri-secret-review
-          image: shahzaibshaikh/review-and-rating:da0b01d488c5943bc9651a82e17f7cfe70cd7148e73e1b9fed5479fe4e38395a
+          image: shahzaibshaikh/review-and-rating:latest
           imagePullPolicy: IfNotPresent
           name: review-and-rating
           resources:
@@ -308,7 +308,7 @@ items:
               secretKeyRef:
                 key: MONGO_URI_SHIPPING
                 name: mongo-uri-secret-shipping
-          image: shahzaibshaikh/shipping-and-logistics:1e70a373c20a692e3f7649d55d6da069be33b26e5592c407ebb249a8b956f180
+          image: shahzaibshaikh/shipping-and-logistics:latest
           imagePullPolicy: IfNotPresent
           name: shipping-and-logistics
           resources:
@@ -362,7 +362,7 @@ items:
               secretKeyRef:
                 key: MONGO_URI_USER
                 name: mongo-uri-secret-user
-          image: shahzaibshaikh/user-account:e515483f3d8af9199a2ee21bbed18f896631e6c5ccfc81b406c2111364278a5c
+          image: shahzaibshaikh/user-account:latest
           imagePullPolicy: IfNotPresent
           name: user-account
           resources:
