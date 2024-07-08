@@ -18,8 +18,10 @@ spec:
           resources:
             limits:
               memory: 300Mi
+              cpu: 180m
             requests:
               memory: 200Mi
+              cpu: 160m
           env:
             - name: SECRET_KEY
               valueFrom:

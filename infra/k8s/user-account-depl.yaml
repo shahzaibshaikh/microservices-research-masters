@@ -17,9 +17,11 @@ spec:
           image: shahzaibshaikh/user-account
           resources:
             limits:
-              memory: 500Mi
+              memory: 400Mi
+              cpu: 600m
             requests:
               memory: 300Mi
+              cpu: 500m
           env:
             - name: SECRET_KEY
               valueFrom:

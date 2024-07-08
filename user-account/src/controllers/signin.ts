@@ -26,9 +26,7 @@ const signIn = async (req: Request, res: Response) => {
 
     // Generate JWT token
     if (!SECRET_KEY) throw new Error("Secret key is not provided");
-    const token: string = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, {
-      expiresIn: "24h" // Token expiration time
-    });
+    const token: string = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY);
 
     const userWithoutPassword = { id: user._id, email: user.email };
 
