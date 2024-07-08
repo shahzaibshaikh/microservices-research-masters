@@ -147,20 +147,28 @@ class WebsiteUser(HttpUser):
 
 class SinusoidalLoadTestShape(LoadTestShape):
     min_users = 0
-    max_users = 50
-    period = 60  # Period of the sinusoidal wave in seconds
+    max_users = 200
+    period_main = 360  # Period of the main sinusoidal wave in seconds
+    period_secondary = 60  # Period of the secondary sinusoidal wave in seconds
+    amplitude_secondary = 0.3  # Amplitude of the secondary sinusoidal wave
     time_limit = 2000000  # Total test duration in seconds
 
     def tick(self):
         run_time = self.get_run_time()
 
         if run_time < self.time_limit:
-            # Calculate the phase angle based on the current run time and period
-            phase_angle = (run_time % self.period) / self.period * (2 * math.pi)
-            
-            # Calculate the user count based on the sinusoidal wave
-            user_count = self.min_users + (self.max_users - self.min_users) * (0.5 * (1 + math.sin(phase_angle)))
-            
+            # Calculate the phase angle for the main wave
+            phase_angle_main = (run_time % self.period_main) / self.period_main * (2 * math.pi)
+            # Calculate the phase angle for the secondary wave
+            phase_angle_secondary = (run_time % self.period_secondary) / self.period_secondary * (2 * math.pi)
+
+            # Calculate the user count based on the superposition of the two waves
+            user_count_main = (self.max_users - self.min_users) * (0.5 * (1 + math.sin(phase_angle_main)))
+            user_count_secondary = self.amplitude_secondary * (self.max_users - self.min_users) * (0.5 * (1 + math.sin(phase_angle_secondary)))
+
+            # Superposition of the two waves
+            user_count = self.min_users + user_count_main + user_count_secondary
+
             return (int(user_count), int(user_count))
         else:
             return None
