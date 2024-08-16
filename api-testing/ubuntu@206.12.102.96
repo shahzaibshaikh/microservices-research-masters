@@ -1,15 +1,12 @@
 import random
 from locust import HttpUser, LoadTestShape, TaskSet, task, constant, between
 import math
-from datetime import datetime
-import pytz
-
 
 class UserTasks(TaskSet):
     wait_time = between(4, 8)
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer TOKEN"
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmIyZDE5ODkzNDllYzY1ZTZlYjRhYWIiLCJlbWFpbCI6InNoYWh6YWliQGdtYWlsLmNvbSIsImlhdCI6MTcyMjk5NTA5Nn0.YEIHE3Zg_S-ZzBRTnNP1XenESuCnjGODxcrkMjwhteo"
         # Add your actual token here
     }
     count = 0
@@ -145,78 +142,37 @@ class WebsiteUser(HttpUser):
     host = "http://microservices-bookstore.dev"  # Replace with your actual host URL
     tasks = [UserTasks]
     wait_time = between(4, 8)  # Time between consecutive requests in seconds
-    spawn_rate = 5  # Reduced spawn rate to slow down user creation
+    spawn_rate = 20
 
-class CustomSinusoidalLoadTestShape(LoadTestShape):
-    min_users = 500
-    max_users = 10000
-    night_peak_amplitude = 120000
-    daytime_peak_amplitude = 2500
-    noise_factor = 0.07  # Noise factor for low-activity periods
-    increased_noise_factor = 0.05  # Increased noise during low-activity periods
-    peak_start_hour = 18  # 6 PM
-    peak_end_hour = 21  # 11 PM
-    peak_duration_hours = peak_end_hour - peak_start_hour  # Duration from 6 PM to 11 PM
-    period_main = 86400  # 24 hours in seconds
-    time_limit = 86400 * 14  # Two weeks duration
-    
-    spawn_rate = 99  # Constant spawn rate
-
-    def get_current_seconds_since_midnight(self):
-        # Get the current time in UTC and convert to EST
-        utc_now = datetime.now(pytz.utc)
-        est_now = utc_now.astimezone(pytz.timezone('America/New_York'))
-        
-        # Calculate seconds since midnight EST
-        return est_now.hour * 3600 + est_now.minute * 60 + est_now.second
+class SinusoidalLoadTestShape(LoadTestShape):
+    min_users = 0
+    max_users = 5000
+    period_main = 720  # Period of the main sinusoidal wave in seconds
+    period_secondary = 120  # Period of the secondary sinusoidal wave in seconds
+    amplitude_secondary = 0.3  # Amplitude of the secondary sinusoidal wave
+    time_limit = 2000000  # Total test duration in seconds
+    noise_factor = 0.05  # Noise factor as a percentage of max_users
 
     def tick(self):
-        current_seconds = self.get_current_seconds_since_midnight()
-        
-        # Calculate peak period start and end in seconds
-        peak_start_seconds = self.peak_start_hour * 3600
-        peak_end_seconds = self.peak_end_hour * 3600
-        
-        # Determine if current time is within the peak period
-        in_peak_period = peak_start_seconds <= current_seconds <= peak_end_seconds
-        
-        if current_seconds < self.time_limit:
-            # Baseline sinusoidal wave
-            baseline_wave = (self.max_users - self.min_users) / 2 * math.sin(
-                (2 * math.pi / self.period_main) * current_seconds) + (self.max_users + self.min_users) / 2
+        run_time = self.get_run_time()
 
-            # Broad peaks during peak hours (6 PM to 11 PM)
-            if in_peak_period:
-                broad_peak_wave = self.night_peak_amplitude * math.sin(
-                    math.pi * (current_seconds - peak_start_seconds) / (self.peak_duration_hours * 3600))
-            else:
-                broad_peak_wave = 0
+        if run_time < self.time_limit:
+            # Calculate the phase angle for the main wave
+            phase_angle_main = (run_time % self.period_main) / self.period_main * (2 * math.pi)
+            # Calculate the phase angle for the secondary wave
+            phase_angle_secondary = (run_time % self.period_secondary) / self.period_secondary * (2 * math.pi)
 
-            # Sharp peaks for sudden spikes during the day
-            sharp_peak_wave = self.daytime_peak_amplitude * math.sin(
-                (2 * math.pi / 1800) * current_seconds)  # Every 30 minutes
+            # Calculate the user count based on the superposition of the two waves
+            user_count_main = (self.max_users - self.min_users) * (0.5 * (1 + math.sin(phase_angle_main)))
+            user_count_secondary = self.amplitude_secondary * (self.max_users - self.min_users) * (0.5 * (1 + math.sin(phase_angle_secondary)))
 
-            # Combine the baseline with broad and sharp peaks
-            user_count = baseline_wave + broad_peak_wave + sharp_peak_wave
+            # Superposition of the two waves
+            user_count = self.min_users + user_count_main + user_count_secondary
 
-            # Add random noise
-            if in_peak_period:
-                noise = random.uniform(-self.noise_factor, self.noise_factor) * self.night_peak_amplitude
-            else:
-                noise = random.uniform(-self.increased_noise_factor, self.increased_noise_factor) * self.max_users
+            # Add some random noise
+            noise = random.uniform(-self.noise_factor, self.noise_factor) * self.max_users
             user_count += noise
 
-            # Ensure user count does not go below the minimum
-            user_count = max(self.min_users, user_count)
-
-            # Debug prints
-            print(f"Current time: {datetime.now(pytz.timezone('America/New_York')).strftime('%H:%M:%S')}")
-            print(f"Current seconds: {current_seconds}")
-            print(f"Peak start seconds: {peak_start_seconds}")
-            print(f"Peak end seconds: {peak_end_seconds}")
-            print(f"In peak period: {in_peak_period}")
-            print(f"User count: {user_count}")
-
-            return int(user_count), self.spawn_rate
+            return (int(user_count), int(user_count))
         else:
             return None
