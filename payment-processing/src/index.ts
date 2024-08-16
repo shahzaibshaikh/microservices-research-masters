@@ -33,7 +33,13 @@ const processOrderCreatedEvent = async (msg: any) => {
 
 const start = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI_PAYMENT || "");
+    await mongoose.connect(process.env.MONGO_URI_PAYMENT || "", {
+      maxPoolSize: 50, // Adjust to your needs; default is 100
+      minPoolSize: 10, // Adjust to your needs; default is 0
+      serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds if the server isn't responding
+      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+    });
+    
     console.log("Connected to Payments database.");
     subscriber("order-listener", "order-created-topic", processOrderCreatedEvent);
   } catch (err) {

@@ -97,9 +97,11 @@ items:
           name: order-management
           resources:
             limits:
-              memory: 300Mi
+              memory: 500Mi
+              cpu: 400m
             requests:
-              memory: 200Mi
+              memory: 400Mi 
+              cpu: 300m
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         dnsPolicy: ClusterFirst
@@ -151,9 +153,11 @@ items:
           name: payment-processing
           resources:
             limits:
-              memory: 300Mi
+              memory: 500Mi
+              cpu: 400m
             requests:
-              memory: 200Mi
+              memory: 400Mi
+              cpu: 300m
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         dnsPolicy: ClusterFirst
@@ -205,9 +209,11 @@ items:
           name: product-catalog
           resources:
             limits:
-              memory: 300Mi
+              memory: 500Mi
+              cpu: 400m
             requests:
-              memory: 200Mi
+              memory: 400Mi
+              cpu: 300m
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         dnsPolicy: ClusterFirst
@@ -259,9 +265,11 @@ items:
           name: review-and-rating
           resources:
             limits:
-              memory: 300Mi
+              memory: 500Mi
+              cpu: 400m
             requests:
-              memory: 200Mi
+              memory: 400Mi
+              cpu: 300m
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         dnsPolicy: ClusterFirst
@@ -313,9 +321,11 @@ items:
           name: shipping-and-logistics
           resources:
             limits:
-              memory: 300Mi
+              memory: 500Mi
+              cpu: 400m
             requests:
-              memory: 200Mi
+              memory: 400Mi
+              cpu: 300m
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         dnsPolicy: ClusterFirst
@@ -333,7 +343,7 @@ items:
     namespace: default
   spec:
     progressDeadlineSeconds: 600
-    replicas: 3
+    replicas: 1
     revisionHistoryLimit: 10
     selector:
       matchLabels:
@@ -368,8 +378,10 @@ items:
           resources:
             limits:
               memory: 500Mi
+              cpu: 700m
             requests:
-              memory: 300Mi
+              memory: 400Mi
+              cpu: 600m
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         dnsPolicy: ClusterFirst
@@ -385,9 +397,6 @@ items:
     name: kubernetes
     namespace: default
   spec:
-    clusterIP: 10.96.0.1
-    clusterIPs:
-    - 10.96.0.1
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -404,9 +413,6 @@ items:
     name: nats-srv
     namespace: default
   spec:
-    clusterIP: 10.97.60.119
-    clusterIPs:
-    - 10.97.60.119
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -426,9 +432,6 @@ items:
     name: order-management-srv
     namespace: default
   spec:
-    clusterIP: 10.96.31.191
-    clusterIPs:
-    - 10.96.31.191
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -446,9 +449,6 @@ items:
     name: payment-processing-srv
     namespace: default
   spec:
-    clusterIP: 10.107.62.107
-    clusterIPs:
-    - 10.107.62.107
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -466,9 +466,6 @@ items:
     name: product-catalog-srv
     namespace: default
   spec:
-    clusterIP: 10.99.148.173
-    clusterIPs:
-    - 10.99.148.173
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -486,9 +483,6 @@ items:
     name: review-and-rating-srv
     namespace: default
   spec:
-    clusterIP: 10.110.242.52
-    clusterIPs:
-    - 10.110.242.52
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -506,9 +500,6 @@ items:
     name: shipping-and-logistics-srv
     namespace: default
   spec:
-    clusterIP: 10.108.113.75
-    clusterIPs:
-    - 10.108.113.75
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -526,9 +517,6 @@ items:
     name: user-account-srv
     namespace: default
   spec:
-    clusterIP: 10.108.15.71
-    clusterIPs:
-    - 10.108.15.71
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -731,22 +719,153 @@ items:
 - apiVersion: autoscaling/v2
   kind: HorizontalPodAutoscaler
   metadata:
-    name: user-account-cpu-hpa
+    name: user-account-hpa
     namespace: default
   spec:
-    maxReplicas: 3
+    maxReplicas: 30
     metrics:
-    - resource:
+    - type: Resource
+      resource:
         name: cpu
         target:
-          averageUtilization: 40
           type: Utilization
-      type: Resource
-    minReplicas: 1
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    minReplicas: 3
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
       name: user-account-depl
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: order-management-hpa
+    namespace: default
+  spec:
+    maxReplicas: 30
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    minReplicas: 3
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: order-management-depl
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: product-catalog-hpa
+    namespace: default
+  spec:
+    maxReplicas: 30
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    minReplicas: 3
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: product-catalog-depl
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: payment-processing-hpa
+    namespace: default
+  spec:
+    maxReplicas: 30
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    minReplicas: 3
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: payment-processing-depl
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: review-and-rating-hpa
+    namespace: default
+  spec:
+    maxReplicas: 30
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    minReplicas: 3
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: review-and-rating-depl
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: shipping-and-logistics-hpa
+    namespace: default
+  spec:
+    maxReplicas: 30
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    minReplicas: 3
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: shipping-and-logistics-depl
 kind: List
 metadata:
   resourceVersion: ""
