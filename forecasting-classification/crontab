@@ -1,5 +1,5 @@
 # Run forecasting.py on container startup
-@reboot python /app/forecasting.py >> /var/log/cron.log 2>&
+@reboot python /app/forecasting.py >> /var/log/cron.log 2>&1
 
 # Run forecasting.py every 8 hours
 0 */8 * * * python /app/forecasting.py >> /var/log/cron.log 2>&1
