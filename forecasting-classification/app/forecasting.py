@@ -830,7 +830,7 @@ def perform_classification(service_dataframes):
   
 # Constants
 FILE_PATH = 'grafana_data.csv'
-GRAFANA_URL = "http://prometheus-operator-grafana.monitoring.svc.cluster.local:80/api/datasources/proxy/1/api/v1/query_range"  # Update with your endpoint
+GRAFANA_URL = "http://prometheus-operator-grafana.monitoring.svc.cluster.local:3000/api/datasources/proxy/1/api/v1/query_range"  # Update with your endpoint
 API_KEY = "glsa_amYzYi8nTLSsHu3t4786NiEEXU5osESe_dc408671"  # Replace with your Grafana API key
 
 fetch_and_process_grafana_data(FILE_PATH, GRAFANA_URL, API_KEY)
