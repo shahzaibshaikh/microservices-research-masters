@@ -93,7 +93,7 @@ items:
                 key: MONGO_URI_ORDER
                 name: mongo-uri-secret-order
           image: shahzaibshaikh/order-management:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: order-management
           resources:
             limits:
@@ -149,7 +149,7 @@ items:
                 key: MONGO_URI_PAYMENT
                 name: mongo-uri-secret-payment
           image: shahzaibshaikh/payment-processing:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: payment-processing
           resources:
             limits:
@@ -205,7 +205,7 @@ items:
                 key: MONGO_URI_PRODUCT
                 name: mongo-uri-secret-product
           image: shahzaibshaikh/product-catalog:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: product-catalog
           resources:
             limits:
@@ -261,7 +261,7 @@ items:
                 key: MONGO_URI_REVIEW
                 name: mongo-uri-secret-review
           image: shahzaibshaikh/review-and-rating:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: review-and-rating
           resources:
             limits:
@@ -317,7 +317,7 @@ items:
                 key: MONGO_URI_SHIPPING
                 name: mongo-uri-secret-shipping
           image: shahzaibshaikh/shipping-and-logistics:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: shipping-and-logistics
           resources:
             limits:
@@ -373,7 +373,7 @@ items:
                 key: MONGO_URI_USER
                 name: mongo-uri-secret-user
           image: shahzaibshaikh/user-account:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: user-account
           resources:
             limits:
@@ -735,8 +735,8 @@ items:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 80
-    minReplicas: 3
+          averageUtilization: 85
+    minReplicas: 2
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
@@ -760,8 +760,8 @@ items:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 80
-    minReplicas: 3
+          averageUtilization: 85
+    minReplicas: 2
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
@@ -785,8 +785,8 @@ items:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 80
-    minReplicas: 3
+          averageUtilization: 85
+    minReplicas: 2
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
@@ -810,8 +810,8 @@ items:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 80
-    minReplicas: 3
+          averageUtilization: 85
+    minReplicas: 2
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
@@ -835,8 +835,8 @@ items:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 80
-    minReplicas: 3
+          averageUtilization: 85
+    minReplicas: 2
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
@@ -860,8 +860,8 @@ items:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 80
-    minReplicas: 3
+          averageUtilization: 85
+    minReplicas: 2
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
@@ -869,3 +869,80 @@ items:
 kind: List
 metadata:
   resourceVersion: ""
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: forecasting-scaling-sa
+  namespace: monitoring
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: monitoring
+  name: forecasting-scaling-role
+rules:
+  - apiGroups: [""]  # Core API group
+    resources: ["pods", "deployments", "replicasets", "nodes"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: forecasting-scaling-binding
+  namespace: monitoring
+subjects:
+  - kind: ServiceAccount
+    name: forecasting-scaling-sa
+    namespace: monitoring
+roleRef:
+  kind: Role
+  name: forecasting-scaling-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forecasting-scaling-depl
+  namespace: monitoring
+  labels:
+    app: forecasting-scaling
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forecasting-scaling
+  template:
+    metadata:
+      labels:
+        app: forecasting-scaling
+    spec:
+      serviceAccountName: forecasting-scaling-sa
+      containers:
+        - name: forecasting-scaling-container
+          image: shahzaibshaikh/forecasting-scaling:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "3G"
+              cpu: "2"
+            requests:
+              memory: "2G"
+              cpu: "1"
+          volumeMounts:
+            - name: log-volume
+              mountPath: /var/log
+          env:
+            - name: KUBERNETES_SERVICE_HOST
+              value: kubernetes.default.svc.cluster.local
+          command: ["/bin/bash", "-c"]
+          args:
+            - >
+              cron && python /app/scaling.py;
+              tail -f /var/log/cron.log
+      volumes:
+        - name: log-volume
+          emptyDir: {}

@@ -9,7 +9,7 @@ class UserTasks(TaskSet):
     wait_time = between(4, 8)
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer TOKEN"
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmIyZDE5ODkzNDllYzY1ZTZlYjRhYWIiLCJlbWFpbCI6InNoYWh6YWliQGdtYWlsLmNvbSIsImlhdCI6MTcyMjk5NTA5Nn0.YEIHE3Zg_S-ZzBRTnNP1XenESuCnjGODxcrkMjwhteo"
         # Add your actual token here
     }
     count = 0
@@ -145,15 +145,13 @@ class WebsiteUser(HttpUser):
     host = "http://microservices-bookstore.dev"  # Replace with your actual host URL
     tasks = [UserTasks]
     wait_time = between(4, 8)  # Time between consecutive requests in seconds
-    spawn_rate = 5  # Reduced spawn rate to slow down user creation
-
 class CustomSinusoidalLoadTestShape(LoadTestShape):
     min_users = 500
-    max_users = 10000
-    night_peak_amplitude = 120000
+    max_users = 9000
+    night_peak_amplitude = 140000
     daytime_peak_amplitude = 2500
     noise_factor = 0.07  # Noise factor for low-activity periods
-    increased_noise_factor = 0.05  # Increased noise during low-activity periods
+    increased_noise_factor = 0.06  # Increased noise during low-activity periods
     peak_start_hour = 18  # 6 PM
     peak_end_hour = 21  # 11 PM
     peak_duration_hours = peak_end_hour - peak_start_hour  # Duration from 6 PM to 11 PM
@@ -182,8 +180,7 @@ class CustomSinusoidalLoadTestShape(LoadTestShape):
         
         if current_seconds < self.time_limit:
             # Baseline sinusoidal wave
-            baseline_wave = (self.max_users - self.min_users) / 2 * math.sin(
-                (2 * math.pi / self.period_main) * current_seconds) + (self.max_users + self.min_users) / 2
+            buser_count = 100000
 
             # Broad peaks during peak hours (6 PM to 11 PM)
             if in_peak_period:
