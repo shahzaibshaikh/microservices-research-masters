@@ -14,7 +14,6 @@ service_files = {
     "classified_predictions_Payment Processing.csv": "payment-processing-depl",
     "classified_predictions_Shipping Logistics.csv": "shipping-and-logistics-depl",
 }
-
 # Offset for early trigger
 offset = timedelta(minutes=5)
 
@@ -97,7 +96,7 @@ while True:
             pod_count_column = f"{service_name} Pod Count"
 
             # Check for actions that need to be executed at this time with offset
-            for index, row in forecast_data.iterrows():
+            for index, row in forecast_data.iloc[::10].iterrows():
                 action_time = row['Time']
                 scaling_action = row['Scaling Action']
                 pod_count = int(round(row[pod_count_column]))
@@ -124,6 +123,6 @@ while True:
         else:
             print(f"[WARNING] CSV file {csv_file} not found for {deployment_name}")
 
-    # Sleep for a minute before checking again
-    print("[INFO] Sleeping for 1 minute before next check")
-    time.sleep(60)
+    # Sleep for 10 minutes before checking again
+    print("[INFO] Sleeping for 10 minutes before next check")
+    time.sleep(600)
