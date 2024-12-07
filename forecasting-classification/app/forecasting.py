@@ -250,7 +250,6 @@ def fetch_and_process_grafana_data(output_csv, grafana_url, api_key):
     # Convert to DataFrame
     df = pd.DataFrame.from_dict(all_data, orient="index").sort_index()
     df.index.name = "Time"
-
     # Save to CSV
     df.to_csv(output_csv)
     print(f"[INFO] Data from Grafana saved to {output_csv}")
@@ -704,7 +703,8 @@ def perform_forecasting(cpu_scaled, memory_scaled, request_count_scaled, pod_cou
     # Loop through each feature and perform predictions
     for idx, (feature_name, model) in enumerate(models_dict.items()):
         # Prepare the input series
-        pred_input = scaled_series_dict[feature_name][:-pred_steps]  # Input data for prediction
+        required_input_length = model.input_chunk_length  # Retrieve the required input_chunk_length
+        pred_input = scaled_series_dict[feature_name][-required_input_length:]  # Take only the last `input_chunk_length` rows
         print(f"Length of pred_input for {feature_name}: {len(pred_input)}")  # Debug print
 
         # Get the appropriate scaler for this feature
@@ -830,7 +830,7 @@ def perform_classification(service_dataframes):
   
 # Constants
 FILE_PATH = 'grafana_data.csv'
-GRAFANA_URL = "http://prometheus-operator-grafana.monitoring.svc.cluster.local:80/api/datasources/proxy/1/api/v1/query_range"  # Update with your endpoint
+GRAFANA_URL = "http://localhost:3000/api/datasources/proxy/1/api/v1/query_range"  # Update with your endpoint
 API_KEY = "glsa_amYzYi8nTLSsHu3t4786NiEEXU5osESe_dc408671"  # Replace with your Grafana API key
 
 fetch_and_process_grafana_data(FILE_PATH, GRAFANA_URL, API_KEY)
