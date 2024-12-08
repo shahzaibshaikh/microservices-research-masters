@@ -2,6 +2,7 @@ import pandas as pd
 import time
 import subprocess
 import json
+import math
 from datetime import datetime, timedelta
 import os
 
@@ -90,16 +91,19 @@ while True:
         if os.path.exists(csv_file):
             forecast_data = pd.read_csv(csv_file)
             forecast_data['Time'] = pd.to_datetime(forecast_data['Time'])
+            
+            # Only keep every 10th row in the DataFrame
+            forecast_data = forecast_data.iloc[::10]
 
             # Infer the service-specific pod count column
             service_name = csv_file.split("_")[2].replace(".csv", "").strip()
             pod_count_column = f"{service_name} Pod Count"
 
             # Check for actions that need to be executed at this time with offset
-            for index, row in forecast_data.iloc[::10].iterrows():
+            for index, row in forecast_data.iterrows():
                 action_time = row['Time']
                 scaling_action = row['Scaling Action']
-                pod_count = int(round(row[pod_count_column]))
+                pod_count = int(math.ceil(row[pod_count_column]) + 1)
 
                 # Trigger actions 3 minutes before action_time
                 if current_time >= (action_time - offset):
