@@ -120,9 +120,9 @@ while True:
                     elif "Vertical" in scaling_action:
                         adjust_resources(deployment_name, scaling_action)
 
-                    # Remove the processed action from the DataFrame
-                    forecast_data.drop(index, inplace=True)
-                    forecast_data.to_csv(csv_file, index=False)  # Save changes
+                    # # Remove the processed action from the DataFrame
+                    # forecast_data.drop(index, inplace=True)
+                    # forecast_data.to_csv(csv_file, index=False)  # Save changes
                     break  # Exit to avoid modifying the DataFrame while iterating
         else:
             print(f"[WARNING] CSV file {csv_file} not found for {deployment_name}")
