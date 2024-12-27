@@ -902,47 +902,47 @@ roleRef:
   name: forecasting-scaling-role
   apiGroup: rbac.authorization.k8s.io
 
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: forecasting-scaling-depl
-  namespace: monitoring
-  labels:
-    app: forecasting-scaling
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: forecasting-scaling
-  template:
-    metadata:
-      labels:
-        app: forecasting-scaling
-    spec:
-      serviceAccountName: forecasting-scaling-sa
-      containers:
-        - name: forecasting-scaling-container
-          image: shahzaibshaikh/forecasting-scaling:latest
-          imagePullPolicy: Always
-          resources:
-            limits:
-              memory: "3G"
-              cpu: "2"
-            requests:
-              memory: "2G"
-              cpu: "1"
-          volumeMounts:
-            - name: log-volume
-              mountPath: /var/log
-          env:
-            - name: KUBERNETES_SERVICE_HOST
-              value: kubernetes.default.svc.cluster.local
-          command: ["/bin/bash", "-c"]
-          args:
-            - >
-              cron && python /app/scaling.py;
-              tail -f /var/log/cron.log
-      volumes:
-        - name: log-volume
-          emptyDir: {}
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: forecasting-scaling-depl
+#   namespace: monitoring
+#   labels:
+#     app: forecasting-scaling
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: forecasting-scaling
+#   template:
+#     metadata:
+#       labels:
+#         app: forecasting-scaling
+#     spec:
+#       serviceAccountName: forecasting-scaling-sa
+#       containers:
+#         - name: forecasting-scaling-container
+#           image: shahzaibshaikh/forecasting-scaling:latest
+#           imagePullPolicy: Always
+#           resources:
+#             limits:
+#               memory: "3G"
+#               cpu: "2"
+#             requests:
+#               memory: "2G"
+#               cpu: "1"
+#           volumeMounts:
+#             - name: log-volume
+#               mountPath: /var/log
+#           env:
+#             - name: KUBERNETES_SERVICE_HOST
+#               value: kubernetes.default.svc.cluster.local
+#           command: ["/bin/bash", "-c"]
+#           args:
+#             - >
+#               cron && python /app/scaling.py;
+#               tail -f /var/log/cron.log
+#       volumes:
+#         - name: log-volume
+#           emptyDir: {}
