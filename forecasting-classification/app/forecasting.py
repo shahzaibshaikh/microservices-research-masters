@@ -231,10 +231,17 @@ def fetch_and_process_grafana_data(output_csv, grafana_url, api_key):
     start_time = start_time_utc5.timestamp()
     end_time = end_time_utc5.timestamp()
 
-    # Time range for the last 2 days (2880 datapoints = 48 hours)
-    # now = datetime.datetime.utcnow()
-    # start_time = (now - datetime.timedelta(days=2)).timestamp()  # 48 hours back
-    # end_time = now.timestamp()
+    # # Define the start and end times
+    # start_time_est = est_tz.localize(datetime.datetime(2024, 12, 25, 7, 29))  # 7:29 AM on 25th December 2024
+    # end_time_est = est_tz.localize(datetime.datetime(2025, 1, 1, 7, 29))     # 7:29 AM on 1st January 2025
+
+    # # Convert to Unix timestamps
+    # start_time = start_time_est.timestamp()
+    # end_time = end_time_est.timestamp()
+
+    # print("Start time (EST): " + str(start_time_est))
+    # print("End time (EST): " + str(end_time_est))
+
 
     # Consolidate all query results into a single DataFrame
     all_data = {}
@@ -831,34 +838,34 @@ def perform_classification(service_dataframes):
   
 # Constants
 FILE_PATH = 'grafana_data_new.csv'
-GRAFANA_URL = "http://prometheus-operator-grafana.monitoring.svc.cluster.local:80/api/datasources/proxy/1/api/v1/query_range"  # Update with your endpoint
+GRAFANA_URL = "http://localhost:3000/api/datasources/proxy/1/api/v1/query_range"  # Update with your endpoint
 API_KEY = "glsa_29oB9K2S9M5zyt5uajMZzzMOMraKnR9v_e837cb9f"  # Replace with your Grafana API key
 
 fetch_and_process_grafana_data(FILE_PATH, GRAFANA_URL, API_KEY)
 
-order_df, product_df, user_df, reviews_df, shipping_df, payment_df = load_data(FILE_PATH)
-seasonal_periods = 24
+# order_df, product_df, user_df, reviews_df, shipping_df, payment_df = load_data(FILE_PATH)
+# seasonal_periods = 24
 
-# Call the data smoothing function after loading the data
-order_smoothed, product_smoothed, user_smoothed, reviews_smoothed, shipping_smoothed, payment_smoothed = data_smoothing(
-    order_df, product_df, user_df, reviews_df, shipping_df, payment_df, seasonal_periods
-)
+# # Call the data smoothing function after loading the data
+# order_smoothed, product_smoothed, user_smoothed, reviews_smoothed, shipping_smoothed, payment_smoothed = data_smoothing(
+#     order_df, product_df, user_df, reviews_df, shipping_df, payment_df, seasonal_periods
+# )
 
-# Execute the function and unpack the returned values
-cpu_scaled, memory_scaled, request_count_scaled, pod_count_scaled, failures_scaled, cluster_cpu_scaled, cluster_memory_scaled, scalers_dict = preprocess_and_scale_features(
-    order_smoothed, reviews_smoothed, payment_smoothed, user_smoothed, shipping_smoothed, product_smoothed
-)
+# # Execute the function and unpack the returned values
+# cpu_scaled, memory_scaled, request_count_scaled, pod_count_scaled, failures_scaled, cluster_cpu_scaled, cluster_memory_scaled, scalers_dict = preprocess_and_scale_features(
+#     order_smoothed, reviews_smoothed, payment_smoothed, user_smoothed, shipping_smoothed, product_smoothed
+# )
 
-# Call the perform_forecasting function
-service_dataframes = perform_forecasting(
-    cpu_scaled,
-    memory_scaled,
-    request_count_scaled,
-    pod_count_scaled,
-    failures_scaled,
-    cluster_cpu_scaled,
-    cluster_memory_scaled,
-    scalers_dict
-)
+# # Call the perform_forecasting function
+# service_dataframes = perform_forecasting(
+#     cpu_scaled,
+#     memory_scaled,
+#     request_count_scaled,
+#     pod_count_scaled,
+#     failures_scaled,
+#     cluster_cpu_scaled,
+#     cluster_memory_scaled,
+#     scalers_dict
+# )
 
-classification_results = perform_classification(service_dataframes)
+# classification_results = perform_classification(service_dataframes)
